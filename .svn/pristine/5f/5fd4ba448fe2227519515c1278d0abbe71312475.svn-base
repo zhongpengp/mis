@@ -1,0 +1,39 @@
+package project.persistent;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import project.vo.ProjectReturnVO;
+import project.vo.ProjectVO;
+import project.vo.ProjectVOExample;
+
+public interface ProjectVOMapper {
+    int countByExample(ProjectVOExample example);
+
+    int deleteByExample(ProjectVOExample example);
+
+    int deleteByPrimaryKey(String projectId);
+
+    int insert(ProjectVO record);
+
+    int insertSelective(ProjectVO record);
+
+    List<ProjectVO> selectByExample(ProjectVOExample example);
+
+    ProjectVO selectByPrimaryKey(String projectId);
+
+    int updateByExampleSelective(@Param("record") ProjectVO record, @Param("example") ProjectVOExample example);
+
+    int updateByExample(@Param("record") ProjectVO record, @Param("example") ProjectVOExample example);
+
+    int updateByPrimaryKeySelective(ProjectVO record);
+
+    int updateByPrimaryKey(ProjectVO record);
+
+	List<ProjectReturnVO> getProjectList(Map<String, Object> param);
+
+	void logoutProject(String projectID);
+	
+}

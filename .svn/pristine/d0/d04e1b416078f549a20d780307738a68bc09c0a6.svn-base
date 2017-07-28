@@ -1,0 +1,68 @@
+package baseMachineMng.vo;
+
+public class ImportProjectMachineInfoReturnVO {
+	private String project_ID;
+	private String project_Name;
+	private String project_CompanyName;
+	private String machine_importNum;
+	private String machine_passNum;
+	private String machine_notPassNum;
+	private String lastImportTime;
+
+	public String getProject_ID() {
+		return project_ID;
+	}
+
+	public void setProject_ID(String project_ID) {
+		this.project_ID = project_ID;
+	}
+
+	public String getProject_Name() {
+		return project_Name;
+	}
+
+	public void setProject_Name(String project_Name) {
+		this.project_Name = project_Name;
+	}
+
+	public String getProject_CompanyName() {
+		return project_CompanyName;
+	}
+
+	public void setProject_CompanyName(String project_CompanyName) {
+		this.project_CompanyName = project_CompanyName;
+	}
+
+	public String getMachine_importNum() {
+		return machine_importNum;
+	}
+
+	public void setMachine_importNum(String machine_importNum) {
+		this.machine_importNum = machine_importNum;
+	}
+
+	public String getMachine_passNum() {
+		return machine_passNum;
+	}
+
+	public void setMachine_passNum(String machine_passNum) {
+		this.machine_passNum = machine_passNum;
+	}
+
+	public String getMachine_notPassNum() {
+		return machine_notPassNum;
+	}
+
+	public void setMachine_notPassNum(String machine_notPassNum) {
+		this.machine_notPassNum = machine_notPassNum;
+	}
+
+	public String getLastImportTime() {
+		return lastImportTime;
+	}
+
+	public void setLastImportTime(String lastImportTime) {
+		this.lastImportTime = lastImportTime;
+	}
+
+}

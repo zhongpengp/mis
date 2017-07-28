@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="log.persistent.LogMapper" >
+	<resultMap type="common.vo.LoginLog" id="LoginLogVO">
+		<result column="loginName" property="loginName" jdbcType="VARCHAR"/>
+		<result column="loginPassword***" property="loginPassword" jdbcType="VARCHAR"/>
+		<result column="loginIP" property="loginIP" jdbcType="VARCHAR"/>
+		<result column="loginTime" property="loginTime" jdbcType="VARCHAR"/>
+		<result column="loginMessage" property="loginMessage" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getAllLoginLog" resultMap="LoginLogVO">
+		select * 
+		from t_login_log
+		order by loginTime desc
+	</select>
+</mapper>

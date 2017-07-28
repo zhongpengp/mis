@@ -1,0 +1,179 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+
+<title>新设备申购</title>
+</head>
+<script type="text/javascript">
+var userID = '<%=request.getSession().getAttribute("userID")%>';
+var preName ;
+	$(document).ready(function(){
+		 
+		 $('#updateUserForm').validate({  
+	           errorElement : 'span',  
+	           errorClass : 'help-block',  
+	           focusInvalid : false,  
+	           rules : {  
+	        	   loginName : {required : true, maxlength : 32,userName:true},  
+	        	   loginPassword : {required : true, maxlength : 12,password:true},
+	        	   phoneNum : {required : true, maxlength : 11,phone:true},  
+	        	 
+	           },  
+	           
+	           messages : {  
+	        	   loginName : {required : "账号必填", maxlength : "最大长度32"},  
+	        	   loginPassword : {required : "密码必填", maxlength : "最大长度12"},
+	        	   phoneNum : {required : "电话必填", maxlength : "最大长度11"},  
+	
+	           }, 
+	  
+	           highlight : function(element) {  
+	               $(element).closest('.data-validate').addClass('has-error');  
+	           },  
+	 
+	           success : function(label) {  
+	               label.closest('.data-validate').removeClass('has-error');  
+	               label.remove();  
+	           },  
+	 
+	           errorPlacement : function(error, element) {  
+	               element.parent('div').append(error);  
+	           },
+	 
+	     }); 
+		 
+		 $.validator.addMethod("userName", function(value, element){
+			 var re = 0;
+			 if(preName==value){
+			 }else{
+				 $.ajax({
+					    url:"<%=path %>/apply/validate.do",    
+					    dataType:"json",   //返回格式为json
+					    async:false,//请求是否异步，默认为异步，这也是ajax重要特性
+					    data:{"name":value},    //参数值
+					    type:"GET",   
+					    success:function(data){
+					    	re = data;
+					    },
+					    error:function(){
+					    }
+					});
+			 }
+      	     return this.optional(element) || (re==0);     
+         }, "用户名已存在");
+		 
+		 $.validator.addMethod("password", function(value, element){
+			 var re=/(?=.*\d)(?=.*[a-zA-Z]).{6,12}/;
+      	     return this.optional(element) || (re.test(value));     
+         }, "密码太简单：6-12位字母、数字组合");
+		 
+		 $.validator.addMethod("phone", function(value, element){
+			 var re = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0-9]))\d{8}$/;
+      	     return this.optional(element) || (re.test(value));     
+         }, "电话号码格式错误");
+		 
+		
+		 $("#save").click(function(){
+			 if ($('#updateUserForm').validate().form()){
+				 $("#userId").val(userID);
+				 $.ajax({
+			          url : "<%=path %>/apply/saveUserInfo.do",
+			          data : $('#updateUserForm').serialize(),
+			          type : "post",
+			          success : function(data) {			
+			              alert_success('【修改信息】','修改成功！');
+			              window.location.Reload();
+			          },
+			          error : function(request) {
+			        	  alert_warning('【修改信息】','修改失败！');
+			        	  window.location.Reload();
+			          }
+			      }); 
+			 }
+		 });
+		 
+	  });
+	  
+	  
+	  
+</script>
+
+<body>
+    <div class="container" style="margin:10px;width: 98%; text-align: center;">
+	<!-- message -->
+	<div id="addFieldHintDiv" class="alert alert-success alert-dismissible"
+		style="display: none" role="alert">
+		<button type="button" onclick="MessageCommonDivHide('addFieldHintDiv')" class="close">
+			<span>&times;</span><span class="sr-only">关闭</span>
+		</button>
+		<strong><span id="addFieldTitle"></span></strong> <span id="addFieldBody"></span>
+	</div> 
+	<!-- message -->
+	<form class="form-horizontal" role="form" id="updateUserForm">
+    <fieldset>
+        <legend >新设备申购</legend>      
+ 	      <div class="form-group">
+				<label for="machineName" class="col-sm-2 control-label"> 设备名称  </label>
+				<div class="col-sm-3 data-validate">
+					<input type="text" class="form-control" name="machineName" placeholder="填写设备名称"
+						id="machineName" > 
+				</div>
+				<label for="machineType" class="col-sm-2 control-label"> 设备型号 </label>
+				<div class="col-sm-3 data-validate" >
+					<input type="text" class="form-control" name="machineType" id="machineType" 
+					    placeholder="填写设备型号 ">
+			    </div>
+			</div>   	
+			<div class="form-group">
+				<label for="machineSize" class="col-sm-2 control-label"> 设备规格 </label>
+				<div class="col-sm-3 data-validate">
+					<input type="text" class="form-control" name="machineSize" placeholder="填写设备规格"
+						id="machineSize" >
+				</div>
+				<label for="machineNum" class="col-sm-2 control-label"> 设备数量 </label>
+				<div class="col-sm-3 data-validate">
+					<input type="text" name="machineNum" id="machineNum" placeholder="填写设备数量" class="form-control" >
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="unit" class="col-sm-2 control-label"> 计量单位 </label>
+				<div class="col-sm-3 data-validate" id="cssSex">
+					<select name="unit" id="unit" class="selectpicker show-tick " data-width=100%>
+						<option value="台">台</option>
+						<option value="件">件</option>
+						<option value="套">套</option>
+						<option value="个">个</option>
+					</select>
+				</div>
+				<label for="producer" class="col-sm-2 control-label"> 生产厂家 </label>
+				<div class="col-sm-3 data-validate">
+					<input type="text" name="producer" id="producer" placeholder="填写设备生产厂家" class="form-control" >
+				</div>
+			</div>
+			<div class="form-group" >
+				<label for="reason" class="col-sm-2 control-label"> 申购原因 </label>
+				<div class="col-md-8 data-validate">
+					<textarea name="reason" id="reason" rows="3"  class="form-control" ></textarea>
+				</div>
+			</div>	
+			<div class="form-group" >	
+				<label for="remark" class="col-sm-2 control-label"> 备注 </label>
+				<div class="col-md-8 data-validate">
+					<textarea name="remark" id="remark" rows="3"  class="form-control" ></textarea>
+				</div>
+			</div>
+	   </fieldset>
+       
+      <div class="control-group"  style="margin-right: 80px;">
+          <div class="controls">
+            <button class="btn btn-success" style="width:100px;" id="save">申&nbsp;&nbsp;&nbsp;请</button>
+          </div>
+       </div> 
+  </form>
+</div>		
+</body>
+</html>

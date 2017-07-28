@@ -1,0 +1,68 @@
+package baseMachineMng.service;
+
+import java.io.FileInputStream;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ReadExcelService {
+
+	public ArrayList<String[]> readExcel(String path, int startColumn, int columnSize) {
+		System.out.println("开始读excel" + System.currentTimeMillis());
+		ArrayList<String[]> result = new ArrayList<>();
+		try {
+			FileInputStream is = new FileInputStream(path);
+			Workbook workbook = WorkbookFactory.create(is);
+			// for (int i = 0; i < sheetCount; i++) {
+			Sheet sheet = workbook.getSheetAt(0);
+			int rowCount = sheet.getPhysicalNumberOfRows();
+			for (int j = startColumn-1; j < rowCount; j++) {
+				Row row = sheet.getRow(j);
+				int cellCount = columnSize;
+				// int cellCount = 45;
+				String[] mycell = new String[cellCount];
+				String cellValue = "";
+				for (int k = 0; k < cellCount; k++) {
+					// mycell[k] = row.getCell(k).toString();
+					Cell cell = row.getCell(k);
+					try {
+						switch (cell.getCellType()) {
+						case HSSFCell.CELL_TYPE_NUMERIC: // 数字
+							DecimalFormat df = new DecimalFormat("0");
+							cellValue = df.format(cell.getNumericCellValue());
+							break;
+						default:
+						case HSSFCell.CELL_TYPE_STRING: // 字符串
+							cellValue = cell.getStringCellValue();
+							break;
+						}
+					} catch (Exception e) {
+						cellValue = "";
+						mycell[k] = cellValue;
+						continue;
+					}
+					mycell[k] = cellValue;
+				}
+				int mycellLength = Arrays.toString(mycell).replaceAll("\\[", "").replaceAll("\\]", "")
+						.replaceAll(",", "").trim().length();
+				if (mycellLength != 0) {
+					result.add(mycell);
+				}
+			}
+		} catch (Exception e) {
+		}
+		System.out.println("结束读excel" + System.currentTimeMillis());
+		return result;
+	}
+
+}

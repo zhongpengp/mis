@@ -1,0 +1,300 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>待检定设备列表</title>
+<link rel="stylesheet" type="text/css" href="<%=path %>/css/dataselect.css">
+<script type="text/javascript">
+	var userType = '<%=request.getSession().getAttribute("userType")%>';
+	var userID = '<%=request.getSession().getAttribute("userID")%>';
+    $(document).ready(function () {   		
+   		$("#startTime").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$("#endTime").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$('#startTime').datetimepicker().on('changeDate', function(ev){
+  			$('#endTime').datetimepicker('setStartDate',$("#startTime").val());
+  		});
+  		$('#endTime').datetimepicker().on('changeDate', function(ev){
+  			$('#startTime').datetimepicker('setEndDate',$("#endTime").val());
+  		});
+        //点击查询后重新加载dataTable的数据
+        $("#query").click(function() {
+        	$('#tableD').bootstrapTable('destroy');
+        	bootStrapTableInit();
+        });
+        //table加载
+        bootStrapTableInit();
+       
+    });
+    
+	function bootStrapTableInit() {
+		$('#tableD').bootstrapTable('destroy');
+		var url = '<%=path%>/projectController/getUncheckList.do';
+		if($("#old").prop('checked')){			
+			url = '<%=path%>/projectController/getCheckedList.do';
+		}
+        //页面加载时初始化dataTable
+        $('#tableD').bootstrapTable({
+        	url:url,
+			method: 'get',
+			 //toolbar: '#toolbar',    //工具按钮用哪个容器
+		       striped: true,      //是否显示行间隔色
+		       cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+		       pagination: true,     //是否显示分页（*）
+		       maintainSelected:true,//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+		       //sortable: false,      //是否启用排序
+		       //sortOrder: "asc",     //排序方式
+		       //sortName:'studentCode',
+		       pageNumber:1,      //初始化加载第一页，默认第一页
+		       pageSize:10,
+		       pageList: [10, 20, 30, 50],  //可供选择的每页的行数（*）
+		       queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+		                           // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+		       //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+		       sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+		       search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+		       //showColumns: true,     //是否显示所有的列
+		       //showRefresh: true,     //是否显示刷新按钮
+		       clickToSelect: true,    //是否启用点击选中行
+		       showExport:true,
+		       exportTypes:['excel', 'doc',  'pdf', 'png', 'xml', 'csv', 'txt', 'sql','json'],
+		 	queryParams : function(data) {
+		 		data.projectId = userID;
+		 		data.macName = $('#macName').val();
+		 		data.startTime = $("#startTime").val();
+		 		data.endTime = $("#endTime").val();
+				return data;
+			},
+			
+			onLoadSuccess : function(data) {
+			},
+			onLoadError : function(data) {
+			},
+			
+			columns : [{field : 'check_box', checkbox : true},				  
+					   {field : 'id',  visible : false},
+					   {field : 'projectId',  visible : false},
+					   {field : 'machineId', visible : false},
+					   {field : 'machineName', title : '设备名称', align: 'center'},
+					   {field : 'producer', title : '生产厂家', align: 'center'},
+					   {field : 'gyxName', title : '供应商', align: 'center'},
+					   {field : 'checkDate', title : '检定日期', align: 'center',
+						   formatter:function(value,row,index){
+							   return value.substring(0,10);
+						   }   
+					   },
+					   {field : 'checkPeriod', title : '检定周期（月）', align: 'center'},
+					   {field : 'checkState', title : '检定状态', align: 'center',
+						   formatter:function(value,row,index){
+							   if(value=='0'){
+								   return "待检定";
+							   }else{
+								   return "已检定";   
+							   }
+						   }   
+					   },
+					   {field : 'checkUnit', title:'检定单位',align: 'center'},
+					   {field : 'checkCost', title : '检定花费',align:'center'},
+					   {field : "checkProve", title : '检定证书', align:'center',
+						   formatter:function(value,row,index){
+							   if(value=='0'){
+								   return "已取";
+							   }else{
+								   return "未取";   
+							   }
+						   }   
+					   },
+					   {field : "checkPay", title : '检定付费', align:'center',
+						   formatter:function(value,row,index){
+							   if(value=='0'){
+								   return "已付";
+							   }else{
+								   return "未付";   
+							   }
+						   }   
+					   }					   
+					]
+		});
+	}
+	
+	function seeDetail() {
+		if($("#old").prop('checked')){
+			instanceList_Hint(1,"已检定的数据不能修改！");
+			return false;
+		}	
+		$("#instanceListHintDiv").hide();
+   	   	var selectobj = $('#tableD').bootstrapTable('getSelections');
+  	   	var length =  selectobj.length;
+        if (length == 1) {
+        	setData(selectobj[0]);
+			$('#addModal').modal('toggle');
+        } else if (length > 1){
+     	   instanceList_Hint(1,"只能选择其中1条数据上传！");
+        } else {
+     	   instanceList_Hint(1,"当前没有被选中的数据！");
+        }
+	}
+	
+	function setData(data){
+		$("#projectId").val(data.projectId);
+		$("#machineId").val(data.machineId);
+		$("#machineName").val(data.machineName);
+		$("#producer").val(data.producer);
+		$("#gyxName").val(data.gyxName);
+		$("#checkDate").val(data.checkDate.substring(0,10));
+		$("#checkPeriod").val(data.checkPeriod);
+	}
+	
+	function addsave(){
+		 if ($('#checkForm').validate().form()){
+			 $.ajax({
+		          url : "<%=path %>/projectController/inserCheckMachine.do",
+		          data : $('#checkForm').serialize(),
+		          type : "post",
+		          success : function(data) {
+		        	  alert_success('【检定信息】','修改成功！');
+		        	  bootStrapTableInit();
+		              closeAdd();
+		          },
+		          error : function(request) {
+		        	  alert_warning('【检定信息】','修改失败！');
+		        	  closeAdd();
+		          }
+		      }); 
+		}
+	}
+	
+	function closeAdd(){
+		$("#checkForm")[0].reset();
+		$("#checkForm").data('bootstrapValidator').resetForm();
+		$("#addModal").modal("hide");
+	}
+	
+	function instanceList_Hint(hintType,hintInfo){
+		 messageCommonDiv(hintType, hintInfo, "instanceListBody","instanceListTitle","instanceListHintDiv");
+	}
+	//消息提醒
+	 function messageCommonDiv(iStatus, messageBody, bodyspan, titleSpan, messageDiv) {
+  	     $('#'+bodyspan).text(messageBody);
+  	     if (iStatus == 0) {
+  	         $('#'+titleSpan).text("成功：");
+  	         $('#'+messageDiv).removeClass("alert-warning").addClass(
+  	                 "alert-success");
+
+  	     } else if (iStatus == 1) {
+  	    	$('#'+titleSpan).text("警告：");
+  	    	$('#'+messageDiv).removeClass("alert-success").addClass(
+  	                 "alert-warning");
+  	     } else {
+  	     }
+  	     $('#'+messageDiv).show();
+  	 }
+
+  	 function MessageCommonDivHide(messageDiv) {
+  		 $('#'+messageDiv).hide();
+  	 }
+	
+	
+</script>
+
+</head>
+
+<body>
+		<div class="content">
+		<div class="page-content-wrapper" style="margin-left:15px;">
+			<div id=page_title>
+				<ul class="breadcrumb" style="margin-bottom:0;">   
+					<li>设备管理</li>  
+					<li class="active">检定信息</li>
+				</ul>
+			</div>
+			<div class="page-content">
+			<div id="main" class="drmtable">
+				<div class="tjsx_title">条件筛选：</div>
+				<!-- message -->
+					<div id="instanceListHintDiv" class="alert alert-success alert-dismissible" style="display: none" role="alert">
+						<button type="button" onclick="MessageCommonDivHide('instanceListHintDiv')" class="close">
+							<span>&times;</span><span class="sr-only">关闭</span>
+						</button>
+						<strong><span id="instanceListTitle"></span></strong> 
+						<span id="instanceListBody"></span>
+					</div>
+				<!-- message -->
+				 <div class="filtrate_box clearfix"  style="margin-bottom: 3px" >
+				    <ul class="filtrate_list" >
+				       <li class="child_li first_sort bac_bl" >
+					        <div class="list_left">申请日期：</div>
+					        <div class="list_right" style="width:850px">
+					          <div class="list_content fix_list">
+					            <div class="col-md-3">
+									<input placeholder="开始时间" type="text" id="startTime" size="10" class="form-control form_datetime" name="begintimequery" readonly>
+								</div>
+					            <div class="col-md-3">
+									<input placeholder="结束时间" type="text" id="endTime" size="10" class="form-control form_datetime" name="endtimequery" readonly>
+								</div>  
+					          </div>
+						  	</div>
+				      </li> 					      
+				      <li class="child_li first_sort" name="sort-type-all">
+				        <div class="list_left">设备名称：</div>
+				        <div class="list_right  mig_top" style="width:850px">
+				          <div class="list_content fix_list">
+				           	<div class="col-md-3">
+								<input type="text" class="form-control" id="macName" >
+							</div>
+							<div class="col-md-4">
+								<label>
+									<input type="checkbox" id="old">检定历史
+								</label>
+								<button id="query" type="button" class="btn btn-primary">查询</button>	  
+							</div>
+				          </div>
+				        </div>
+				      </li>
+				    </ul>
+				</div>
+							
+				<div class="row">
+					<div class="col-sm-12" style="width: 100%">
+						<div id="toolbar" class="btn-group">
+							<div align="center"><font id="tableTitle" style="font-size: large;font-weight: bold;"></font></div>
+							<button id="detail" type="button" class="btn btn-primary" data-toggle="modal" onclick="seeDetail()">检定信息录入</button>
+						</div>
+						<!-- table -->
+						<table id="tableD"class="table table-condensed" data-toolbar="#toolbar"data-toggle="table" data-striped="true" data-search="true"  data-show-columns="true">
+							<thead style="background:#ace4ff;">
+								<tr></tr>
+							</thead>
+						</table>
+					</div>
+			  </div>
+			  
+			  <!-- Modal add-->
+					<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+						aria-labelledby="addModalLabel" aria-hidden="true">
+						<div class="modal-dialog" style="width: 880px">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+									</button>
+									<h4 class="modal-title" id="addModalLabel">【检定信息】</h4>
+								</div>
+								<div class="modal-body">
+									<jsp:include page="CheckMachineInfo.jsp"></jsp:include>
+								</div>
+								 <div class="modal-footer">
+									  <button type="button" class="btn btn-default"
+									 	data-dismiss="modal" >关闭</button>
+									 <button type="button" class="btn btn-primary" onclick="addsave()">保存</button>
+								 </div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal -->
+			</div>			
+			</div>
+			</div>
+		</div>
+</body>
+</html>

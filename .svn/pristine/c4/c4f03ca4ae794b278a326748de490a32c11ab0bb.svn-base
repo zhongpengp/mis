@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menu.persistent.MenuMapper">
+	<resultMap type="menu.vo.Menu" id="menuVO">
+		<result column="menu_id" property="menuID" jdbcType="VARCHAR" />
+		<result column="menu_name" property="menuName" jdbcType="VARCHAR" />
+		<result column="target_page" property="targetPage" jdbcType="VARCHAR" />
+		<result column="belong_menu_id" property="belongMenuID" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap type="menu.vo.Menu" id="mgtResponsibility">
+		<result column="id" property="menuID" jdbcType="VARCHAR" />
+		<result column="name" property="menuName" jdbcType="VARCHAR" />
+		<result column="url" property="targetPage" jdbcType="VARCHAR" />
+		<result column="parent_id" property="belongMenuID" jdbcType="VARCHAR" />
+		<result column="icon" property="menuIcon" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap type="menu.vo.MenuWithOwnedRoleID" id="menuWithOwnedRoleIDVO">
+		<result column="id" property="menuID" jdbcType="VARCHAR" />
+		<result column="name" property="menuName" jdbcType="VARCHAR" />
+		<result column="url" property="targetPage" jdbcType="VARCHAR" />
+		<result column="parent_id" property="belongMenuID"
+			jdbcType="VARCHAR" />
+		<result column="role_id" property="roleID" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="getMenusByRoleIDs" resultMap="mgtResponsibility">
+		select t1.* 
+		from t_menu t1,mis.role_responsibility t2
+		where t2.respon_id=t1.id
+		and t2.role_id in
+		<foreach collection="list" item="roleIDs" index="index" open="("
+			close=")" separator=",">
+			#{roleIDs}
+		</foreach>
+		order by t1.id
+	</select>
+
+	<select id="getMenusByRoleID" parameterType="java.lang.String"
+		resultMap="menuVO">
+		select
+		`t_menu`.`belong_menu_id`,`t_menu`.`menu_id`,`t_menu`.`menu_name`,`t_menu`.`target_page`
+		from `t_menu_distribution`
+		left join `t_menu`
+		on
+		`t_menu_distribution`.`menu_id`=`t_menu`.`menu_id`
+		where
+		`t_menu_distribution`.`role_id`=#{param1}
+		order by `t_menu`.`menu_id`
+	</select>
+
+	<select id="getMenusWithIsOwned" parameterType="java.lang.String"
+		resultMap="menuWithOwnedRoleIDVO">
+		select t1.*,t2.role_id from t_menu t1
+		left join mis.role_responsibility t2
+		on t1.id=t2.respon_id
+		and t2.role_id=#{param1}
+		order by parent_id
+	</select>
+	<select id="getParentIDByMenuID" parameterType="java.lang.String" resultType="java.lang.String">
+		select `t_menu`.`belong_menu_id` from `t_menu` where `t_menu`.`menu_id`=#{param1}
+	</select>
+	
+	<select id="getAllMenu" resultMap="mgtResponsibility">
+		select * from t_menu
+		order by menu_id
+	</select>
+	<select id="checkMenuNameExist" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(1) from t_menu where name=#{param1}
+	</select>
+	
+	<select id="getRootLevelMenu" resultMap="mgtResponsibility">
+		select * from t_menu where parent_id='0'
+	</select>
+	
+	<select id="getMenuMaxID" resultType="java.lang.Integer">
+		select max(id) from t_menu
+	</select>
+	
+	<select id="getNotRootMenuMaxID" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select max(menu_id+0) from t_menu where belong_menu_id=#{param1}
+	</select>
+	
+	<insert id="saveNewMenu" parameterType="java.lang.String">
+		insert into t_menu values(#{param1},#{param2},#{param4},#{param3},#{param5})
+	</insert>
+	
+	<select id="getMenuByMenuID" parameterType="java.lang.String" resultMap="mgtResponsibility">
+		select * from t_menu where id=#{param1}
+	</select>
+	
+	<update id="updateNewMenu" parameterType="java.lang.String">
+		update t_menu set name=#{param2},url=#{param3},parent_id=#{param4},icon=#{param5}
+		where id=#{param1}
+	</update>
+	
+	<delete id="deleteMenuByIDs" parameterType="java.util.List">
+		delete from t_menu where id in
+		<foreach collection="list" index="index" open="(" close=")" separator="," item="menuIDList">
+			#{menuIDList}
+		</foreach>
+	</delete>
+	<delete id="deleteMenuDistributionByIDs" parameterType="java.util.List">
+		delete from mis.role_responsibility where respon_id in
+		<foreach collection="list" index="index" open="(" close=")" separator="," item="menuIDList">
+			#{menuIDList}
+		</foreach>
+	</delete>
+</mapper>

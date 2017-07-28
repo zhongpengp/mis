@@ -1,0 +1,99 @@
+package common.service;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import common.persistent.MessageVOMapper;
+import common.vo.MessageVO;
+import common.vo.Project;
+import common.vo.UserVO;
+@Service
+public class MessageServiceImpl implements MessageService {
+	
+	@Autowired
+	private MessageVOMapper messageVOMapper;
+	
+	@Override
+	public List<MessageVO> getMessageByUserId(String startTime, String endTime,String queryType, HttpServletRequest request
+			,String msgtheme) {
+		String userId = (String) request.getSession().getAttribute("userID");
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(queryType.equals("recevie")){
+			map.put("receveUser", userId);
+		}else{
+			map.put("sendUser", userId);
+		}
+		map.put("startTime", startTime);
+		map.put("endTime", endTime);
+		map.put("messageTheme", msgtheme);
+		return messageVOMapper.getMessageByUserId(map);
+	}
+
+	@Override
+	public List<Project> getProjectInfoByUserType(HttpServletRequest request) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		String userType = (String) request.getSession().getAttribute("userType");
+		map.put("usertype", userType);
+		return messageVOMapper.selectProjectInfoByUserType(map);
+	}
+
+	@Override
+	public void addNewMessage(MessageVO message) {
+		String[] userStrs = message.getRecevieUserId().split(",");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String date = sdf.format(new Date());
+		for (String recevieuserId : userStrs) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("messageId", UUID.randomUUID().toString().replaceAll("-", ""));
+			map.put("sendUserId", message.getSendUserId());
+			map.put("recevieUserId", recevieuserId);
+			map.put("sendTime", date);
+			map.put("isRecevierRead", "1");
+			map.put("isRead", "0");
+			map.put("messageTheme", message.getMessageTheme());
+			map.put("messageSend", message.getMessageSend());
+			map.put("attachmentSend", message.getAttachmentSend());
+			messageVOMapper.insertNewMessage(map);
+		}
+		
+	}
+
+	@Override
+	public List<UserVO> getHeadquartersUser(String userType,String userID) {
+		if("1".equals(userType)){ //公司
+			return messageVOMapper.getUserByGS(userID);
+		}else if("2".equals(userType)){ //项目
+			return messageVOMapper.getUserByXM(userID);
+		}else if ("3".equals(userType)){ //供应商
+			return messageVOMapper.getUserByGYS(userID);
+		}
+		return null;
+	}
+
+	@Override
+	public void recevieMessage(MessageVO message) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("messageReply", message.getMessageReply());
+		map.put("attachmentReply", message.getAttachmentReply());
+		map.put("messageId", message.getMessageId());
+		map.put("isRecevierRead", '2');
+		messageVOMapper.recevieMessage(map);
+	}
+
+	@Override
+	public void updateMsgRead(String msgId) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("isRead", "1");
+		map.put("msgId", msgId);
+		messageVOMapper.updateMsgRead(map);
+	}
+
+}

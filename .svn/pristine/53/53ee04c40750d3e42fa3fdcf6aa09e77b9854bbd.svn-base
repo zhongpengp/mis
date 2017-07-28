@@ -1,0 +1,183 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+	String path = request.getContextPath();
+	response.setHeader("Pragma","No-cache");    
+	response.setHeader("Cache-Control","no-cache");    
+	response.setDateHeader("Expires", 0);  
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+
+<title>申请审批</title>
+</head>
+<script type="text/javascript">
+
+var userID = '<%=request.getSession().getAttribute("userID")%>';
+var userName = '<%=request.getSession().getAttribute("userName")%>';
+var userType = '<%=request.getSession().getAttribute("userType")%>';
+
+	$(document).ready(function(){
+		 $('#addApplyForm').validate({  
+	           errorElement : 'span',  
+	           errorClass : 'help-block',  
+	           focusInvalid : false,  
+	           rules : {  
+	        	   applyuser : {required : true, maxlength : 100},  
+	        	   applyuserID : {required : true, maxlength : 100},
+	        	   applyphone : {required : true, maxlength : 100},  
+	        	   applymail : {required : true, maxlength : 100},
+	        	   applyproject : {required : true, maxlength : 100},
+	        	   projectDESC : { maxlength : 1000},
+	           },  
+	           
+	           messages : {  
+	        	   applyuser : {required : "申请人姓名必填", maxlength : "最大长度100"},  
+	        	   applyuserID : {required : "申请人身份证号必填", maxlength : "最大长度100"},
+	        	   applyphone : {required : "申请人电话必填", maxlength : "最大长度100"},  
+	        	   applymail : {required : "申请人邮箱必填", maxlength :"最大长度100"},
+	        	   applyproject : {required : "申请项目必填", maxlength : "最大长度100"},
+	        	   projectDESC : { maxlength : "最大长度1000"},
+	           }, 
+	  
+	           highlight : function(element) {  
+	               $(element).closest('.data-validate').addClass('has-error');  
+	           },  
+	 
+	           success : function(label) {  
+	               label.closest('.data-validate').removeClass('has-error');  
+	               label.remove();  
+	           },  
+	 
+	           errorPlacement : function(error, element) {  
+	               element.parent('div').append(error);  
+	           },
+	 
+	     }); 
+		
+	  });
+	  
+	  function saveApprove() {
+		  $("#approveUser").val(userID);
+	      $.ajax({
+	          url : "<%=path %>/apply/approve.do",
+	          data : $('#addApplyForm').serialize(),
+	          type : "post",
+	          success : function(data) {
+	              $('#updateModal').modal('hide');
+	              alert_success('【审批结果】','审批成功！');
+	          },
+	          error : function(request) {
+	        	  alert_warning('【审批结果】','审批失败！');
+	          }
+	      }); 
+	  }
+	  
+	  function openApprove(row){
+		   $("#applyproject").val(row.applyproject);
+		   $("#applyuser").val(row.applyuser);
+		   $("#applyuserID").val(row.applyuserID);
+		   $("#applyphone").val(row.applyphone);
+		   $("#applymail").val(row.applymail);
+		   $("#projectDESC").val(row.projectDESC);
+		   $("#applyTime").val(row.applyTime);
+		   $("#applyID").val(row.applyID);
+		   $("#projectType").val(row.projectType);
+	  }
+</script>
+
+<body>
+	<!-- message -->
+	<div id="addFieldHintDiv" class="alert alert-success alert-dismissible"
+		style="display: none" role="alert">
+		<button type="button" onclick="MessageCommonDivHide('addFieldHintDiv')" class="close">
+			<span>&times;</span><span class="sr-only">关闭</span>
+		</button>
+		<strong><span id="addFieldTitle"></span></strong> <span id="addFieldBody"></span>
+	</div> 
+	<!-- message -->
+	<div id="addFieldDiv">
+		<form id="addApplyForm" class="form-horizontal" role="form">
+		<input type="hidden" name="status" id="statusAdd">
+		<input type="hidden" name="applytype" id="applytypeAdd">
+	
+			<div class="form-group">
+				<label for="applyproject" class="col-md-2 control-label"> 项目名称  </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" class="form-control" name="applyproject" id="applyproject" readonly> 
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="projectType" class="col-md-2 control-label"> 项目类型  </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" class="form-control" name="projectType" id="projectType" readonly> 
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="applyTime" class="col-md-2 control-label"> 申请时间  </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" class="form-control" name="applyTime" id="applyTime" readonly> 
+				</div>
+			</div>	
+			<div class="form-group" >
+				<label for="applyuser" class="col-md-2 control-label"> 姓名 </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" class="form-control" name="applyuser" id="applyuser" readonly>
+				</div>
+			</div>	
+			<div class="form-group" >
+				<label for="applyuserID" class="col-md-2 control-label"> 身份证号 </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" class="form-control" name="applyuserID" id="applyuserID" readonly>
+				</div>
+			</div>
+			
+			<div class="form-group" >
+				<label for="applyphone" class="col-md-2 control-label"> 联系电话 </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" name="applyphone"  class="form-control" id="applyphone" readonly>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="applymail" class="col-md-2 control-label"> 邮箱 </label>
+				<div class="col-md-8 data-validate">
+					<input type="text" name="applymail"  class="form-control" id="applymail" readonly>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="projectDESC" class="col-md-2 control-label"> 项目描述 </label>
+				<div class="col-md-8 data-validate">
+					<textarea name="projectDESC" id="projectDESC" rows="3"  class="form-control" readonly></textarea>
+				</div>
+			</div>
+		
+			<div class="form-group">
+				<label for="applyStatus" class="col-md-2 control-label">审批结果 </label>
+				<div class="col-md-2 data-validate">
+					<select name="applyStatus" id="applyStatus" class="selectpicker  show-tick">
+						<option value="1">通过</option>
+						<option value="2">未通过</option>
+					</select>
+				</div>			
+			</div>
+			<div class="form-group" >
+				<label for="approveBody" class="col-md-2 control-label"> 审批内容 </label>
+				<div class="col-md-8 data-validate">
+					<textarea name="approveBody" id="approveBody" rows="3"  class="form-control" ></textarea>
+				</div>
+			</div>
+			<input type="hidden" name="approveUser" id="approveUser" >
+			<input type="hidden" name="applyID" id="applyID" >
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="saveApprove()">确定</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</form>
+	</div>
+	
+</body>
+</html>

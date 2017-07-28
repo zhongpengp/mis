@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="menu.persistent.RoleMapper">
+	<resultMap type="menu.vo.Role" id="roleVO">
+		<result column="roleID" property="roleID" jdbcType="VARCHAR" />
+		<result column="roleName" property="roleName" jdbcType="VARCHAR" />
+		<result column="roleDesc" property="roleDesc" jdbcType="VARCHAR" />
+		<result column="roleType" property="roleType" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap type="menu.vo.Role" id="mgtRole">
+		<result column="id" property="roleID" jdbcType="VARCHAR" />
+		<result column="name" property="roleName" jdbcType="VARCHAR" />
+		<result column="role_description" property="roleDesc" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="getRoleIDsbyUserID" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select distinct t.role_id from mis.role_user t where t.user_id=#{param1}
+	</select>
+	<select id="getAllRoles" resultMap="roleVO">
+		select * from t_role order by (`t_role`.`roleID`+0)
+	</select>
+	<select id="getRolesByName" resultMap="mgtRole" parameterType="java.lang.String">
+		select * from mis.role
+		<where>
+			1=1
+			<if test="_parameter!=''">
+				and name like concat(concat('%',#{roleName}),'%')
+			</if>
+		</where>
+		 order by id
+	</select>
+	<delete id="deleteRole_MenuByRoleID">
+		delete from mis.role_responsibility where role_id=#{param1}
+	</delete>
+	<insert id="saveRole_Menu">
+		insert into mis.role_responsibility values(#{param1},#{param2},#{param3})
+	</insert>
+	<select id="getRole_MenuMaxID" resultType="java.lang.Integer">
+		select max(id) from  mis.role_responsibility
+	</select>
+	<select id="getRoleMaxID" resultType="java.lang.Integer">
+		select max(id) from mis.role
+	</select>
+	<select id="checkExistParent" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(1) from `t_menu_distribution`
+		where `t_menu_distribution`.`menu_id`=#{param1} and `t_menu_distribution`.`role_id`=#{param2}
+	</select>
+	<select id="checkRoleNameExist" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(*) from mis.role where name = #{param1}
+	</select>
+	<insert id="saveNewRole" parameterType="java.lang.String">
+		insert into mis.role values(#{param1},#{param2},#{param3})
+	</insert>
+	<select id="getRoleByRoleID" parameterType="java.lang.String" resultMap="mgtRole">
+		select * from mis.role where id =#{param1}
+	</select>
+	
+	<update id="updateRole" parameterType="menu.vo.Role">
+		update mis.role 
+		set name=#{roleName,jdbcType=VARCHAR},role_description=#{roleDesc,jdbcType=VARCHAR}
+		where id=#{roleID,jdbcType=INTEGER}
+	</update>
+	<delete id="deleteRoleByRoleIDs">
+		delete from mis.role where id in
+		<foreach collection="list" item="ids" open="(" close=")" separator="," index="index">
+			#{ids}
+		</foreach>
+	</delete>
+	<delete id="deleteRole_UserByRoleIDs">
+		delete from mis.role_user where role_id in
+		<foreach collection="list" item="ids" open="(" close=")" separator="," index="index">
+			#{ids}
+		</foreach>
+	</delete>
+	<delete id="deleteRole_ResponByRoleIDs">
+		delete from mis.role_responsibility where role_id in
+		<foreach collection="list" item="ids" open="(" close=")" separator="," index="index">
+			#{ids}
+		</foreach>
+	</delete>
+	<select id="selectMenuParentIDbyChildID" resultType="java.lang.String">
+		select distinct t1.id from mis.responsibility t1
+		left join mis.responsibility t2
+		on t2.parent_id = t1.id
+		and t2.id in
+		<foreach collection="list" item="childIDList" open="(" close=")" separator="," index="index">
+			#{childIDList}
+		</foreach>
+		where t2.id is not null
+	</select>
+</mapper>

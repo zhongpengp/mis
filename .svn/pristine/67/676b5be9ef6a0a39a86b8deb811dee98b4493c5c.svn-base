@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="baseMachineMng.persistent.TableTotalMapper" >
+  <resultMap id="BaseResultMap" type="baseMachineMng.vo.TableTotal" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="XINGHAO" property="xinghao" jdbcType="VARCHAR" />
+    <result column="GUIGE" property="guige" jdbcType="VARCHAR" />
+    <result column="SHULIANG" property="shuliang" jdbcType="DOUBLE" />
+    <result column="DANWEI" property="danwei" jdbcType="VARCHAR" />
+    <result column="SHENGCHANGCHANGJIA" property="shengchangchangjia" jdbcType="VARCHAR" />
+    <result column="DANJIA" property="danjia" jdbcType="DOUBLE" />
+    <result column="XINJIUCHENGDU" property="xinjiuchengdu" jdbcType="VARCHAR" />
+    <result column="GOUZHIRIQI" property="gouzhiriqi" jdbcType="VARCHAR" />
+    <result column="JIANDINGDANJIA" property="jiandingdanjia" jdbcType="DOUBLE" />
+    <result column="JIANDINGDANWEI" property="jiandingdanwei" jdbcType="VARCHAR" />
+    <result column="JIANDINGFEIHEJI" property="jiandingfeiheji" jdbcType="DOUBLE" />
+    <result column="SHANGCIJIANDINGSJ" property="shangcijiandingsj" jdbcType="VARCHAR" />
+    <result column="JIANDINGZHOUQI" property="jiandingzhouqi" jdbcType="VARCHAR" />
+    <result column="TIGONGYIQIDANWEI" property="tigongyiqidanwei" jdbcType="VARCHAR" />
+    <result column="YIWEIXIUCISHU" property="yiweixiucishu" jdbcType="INTEGER" />
+    <result column="SHIFOUBAOXIUQI" property="shifoubaoxiuqi" jdbcType="VARCHAR" />
+    <result column="WEIXIUDANWEI" property="weixiudanwei" jdbcType="VARCHAR" />
+    <result column="WEIXIUFEIYONG" property="weixiufeiyong" jdbcType="DOUBLE" />
+    <result column="importTime" property="importtime" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="baseMachineMng.vo.TableTotal" extends="BaseResultMap" >
+    <result column="WEIXIUNEIRONG" property="weixiuneirong" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, PROJECT_ID, NAME, XINGHAO, GUIGE, SHULIANG, DANWEI, SHENGCHANGCHANGJIA, DANJIA, 
+    XINJIUCHENGDU, GOUZHIRIQI, JIANDINGDANJIA, JIANDINGDANWEI, JIANDINGFEIHEJI, SHANGCIJIANDINGSJ, 
+    JIANDINGZHOUQI, TIGONGYIQIDANWEI, YIWEIXIUCISHU, SHIFOUBAOXIUQI, WEIXIUDANWEI, WEIXIUFEIYONG, 
+    importTime
+  </sql>
+  <sql id="Blob_Column_List" >
+    WEIXIUNEIRONG
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="baseMachineMng.vo.TableTotalExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from TABLE_TOTAL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="baseMachineMng.vo.TableTotalExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from TABLE_TOTAL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from TABLE_TOTAL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from TABLE_TOTAL
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="baseMachineMng.vo.TableTotalExample" >
+    delete from TABLE_TOTAL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="baseMachineMng.vo.TableTotal" >
+    insert into TABLE_TOTAL (ID, PROJECT_ID, NAME, 
+      XINGHAO, GUIGE, SHULIANG, 
+      DANWEI, SHENGCHANGCHANGJIA, DANJIA, 
+      XINJIUCHENGDU, GOUZHIRIQI, JIANDINGDANJIA, 
+      JIANDINGDANWEI, JIANDINGFEIHEJI, SHANGCIJIANDINGSJ, 
+      JIANDINGZHOUQI, TIGONGYIQIDANWEI, YIWEIXIUCISHU, 
+      SHIFOUBAOXIUQI, WEIXIUDANWEI, WEIXIUFEIYONG, 
+      importTime, WEIXIUNEIRONG)
+    values (#{id,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{xinghao,jdbcType=VARCHAR}, #{guige,jdbcType=VARCHAR}, #{shuliang,jdbcType=DOUBLE}, 
+      #{danwei,jdbcType=VARCHAR}, #{shengchangchangjia,jdbcType=VARCHAR}, #{danjia,jdbcType=DOUBLE}, 
+      #{xinjiuchengdu,jdbcType=VARCHAR}, #{gouzhiriqi,jdbcType=VARCHAR}, #{jiandingdanjia,jdbcType=DOUBLE}, 
+      #{jiandingdanwei,jdbcType=VARCHAR}, #{jiandingfeiheji,jdbcType=DOUBLE}, #{shangcijiandingsj,jdbcType=VARCHAR}, 
+      #{jiandingzhouqi,jdbcType=VARCHAR}, #{tigongyiqidanwei,jdbcType=VARCHAR}, #{yiweixiucishu,jdbcType=INTEGER}, 
+      #{shifoubaoxiuqi,jdbcType=VARCHAR}, #{weixiudanwei,jdbcType=VARCHAR}, #{weixiufeiyong,jdbcType=DOUBLE}, 
+      #{importtime,jdbcType=VARCHAR}, #{weixiuneirong,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="baseMachineMng.vo.TableTotal" >
+    insert into TABLE_TOTAL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="projectId != null" >
+        PROJECT_ID,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="xinghao != null" >
+        XINGHAO,
+      </if>
+      <if test="guige != null" >
+        GUIGE,
+      </if>
+      <if test="shuliang != null" >
+        SHULIANG,
+      </if>
+      <if test="danwei != null" >
+        DANWEI,
+      </if>
+      <if test="shengchangchangjia != null" >
+        SHENGCHANGCHANGJIA,
+      </if>
+      <if test="danjia != null" >
+        DANJIA,
+      </if>
+      <if test="xinjiuchengdu != null" >
+        XINJIUCHENGDU,
+      </if>
+      <if test="gouzhiriqi != null" >
+        GOUZHIRIQI,
+      </if>
+      <if test="jiandingdanjia != null" >
+        JIANDINGDANJIA,
+      </if>
+      <if test="jiandingdanwei != null" >
+        JIANDINGDANWEI,
+      </if>
+      <if test="jiandingfeiheji != null" >
+        JIANDINGFEIHEJI,
+      </if>
+      <if test="shangcijiandingsj != null" >
+        SHANGCIJIANDINGSJ,
+      </if>
+      <if test="jiandingzhouqi != null" >
+        JIANDINGZHOUQI,
+      </if>
+      <if test="tigongyiqidanwei != null" >
+        TIGONGYIQIDANWEI,
+      </if>
+      <if test="yiweixiucishu != null" >
+        YIWEIXIUCISHU,
+      </if>
+      <if test="shifoubaoxiuqi != null" >
+        SHIFOUBAOXIUQI,
+      </if>
+      <if test="weixiudanwei != null" >
+        WEIXIUDANWEI,
+      </if>
+      <if test="weixiufeiyong != null" >
+        WEIXIUFEIYONG,
+      </if>
+      <if test="importtime != null" >
+        importTime,
+      </if>
+      <if test="weixiuneirong != null" >
+        WEIXIUNEIRONG,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="xinghao != null" >
+        #{xinghao,jdbcType=VARCHAR},
+      </if>
+      <if test="guige != null" >
+        #{guige,jdbcType=VARCHAR},
+      </if>
+      <if test="shuliang != null" >
+        #{shuliang,jdbcType=DOUBLE},
+      </if>
+      <if test="danwei != null" >
+        #{danwei,jdbcType=VARCHAR},
+      </if>
+      <if test="shengchangchangjia != null" >
+        #{shengchangchangjia,jdbcType=VARCHAR},
+      </if>
+      <if test="danjia != null" >
+        #{danjia,jdbcType=DOUBLE},
+      </if>
+      <if test="xinjiuchengdu != null" >
+        #{xinjiuchengdu,jdbcType=VARCHAR},
+      </if>
+      <if test="gouzhiriqi != null" >
+        #{gouzhiriqi,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingdanjia != null" >
+        #{jiandingdanjia,jdbcType=DOUBLE},
+      </if>
+      <if test="jiandingdanwei != null" >
+        #{jiandingdanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingfeiheji != null" >
+        #{jiandingfeiheji,jdbcType=DOUBLE},
+      </if>
+      <if test="shangcijiandingsj != null" >
+        #{shangcijiandingsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingzhouqi != null" >
+        #{jiandingzhouqi,jdbcType=VARCHAR},
+      </if>
+      <if test="tigongyiqidanwei != null" >
+        #{tigongyiqidanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="yiweixiucishu != null" >
+        #{yiweixiucishu,jdbcType=INTEGER},
+      </if>
+      <if test="shifoubaoxiuqi != null" >
+        #{shifoubaoxiuqi,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiudanwei != null" >
+        #{weixiudanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiufeiyong != null" >
+        #{weixiufeiyong,jdbcType=DOUBLE},
+      </if>
+      <if test="importtime != null" >
+        #{importtime,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiuneirong != null" >
+        #{weixiuneirong,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="baseMachineMng.vo.TableTotalExample" resultType="java.lang.Integer" >
+    select count(*) from TABLE_TOTAL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update TABLE_TOTAL
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectId != null" >
+        PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        NAME = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xinghao != null" >
+        XINGHAO = #{record.xinghao,jdbcType=VARCHAR},
+      </if>
+      <if test="record.guige != null" >
+        GUIGE = #{record.guige,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shuliang != null" >
+        SHULIANG = #{record.shuliang,jdbcType=DOUBLE},
+      </if>
+      <if test="record.danwei != null" >
+        DANWEI = #{record.danwei,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shengchangchangjia != null" >
+        SHENGCHANGCHANGJIA = #{record.shengchangchangjia,jdbcType=VARCHAR},
+      </if>
+      <if test="record.danjia != null" >
+        DANJIA = #{record.danjia,jdbcType=DOUBLE},
+      </if>
+      <if test="record.xinjiuchengdu != null" >
+        XINJIUCHENGDU = #{record.xinjiuchengdu,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gouzhiriqi != null" >
+        GOUZHIRIQI = #{record.gouzhiriqi,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jiandingdanjia != null" >
+        JIANDINGDANJIA = #{record.jiandingdanjia,jdbcType=DOUBLE},
+      </if>
+      <if test="record.jiandingdanwei != null" >
+        JIANDINGDANWEI = #{record.jiandingdanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jiandingfeiheji != null" >
+        JIANDINGFEIHEJI = #{record.jiandingfeiheji,jdbcType=DOUBLE},
+      </if>
+      <if test="record.shangcijiandingsj != null" >
+        SHANGCIJIANDINGSJ = #{record.shangcijiandingsj,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jiandingzhouqi != null" >
+        JIANDINGZHOUQI = #{record.jiandingzhouqi,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tigongyiqidanwei != null" >
+        TIGONGYIQIDANWEI = #{record.tigongyiqidanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yiweixiucishu != null" >
+        YIWEIXIUCISHU = #{record.yiweixiucishu,jdbcType=INTEGER},
+      </if>
+      <if test="record.shifoubaoxiuqi != null" >
+        SHIFOUBAOXIUQI = #{record.shifoubaoxiuqi,jdbcType=VARCHAR},
+      </if>
+      <if test="record.weixiudanwei != null" >
+        WEIXIUDANWEI = #{record.weixiudanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="record.weixiufeiyong != null" >
+        WEIXIUFEIYONG = #{record.weixiufeiyong,jdbcType=DOUBLE},
+      </if>
+      <if test="record.importtime != null" >
+        importTime = #{record.importtime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.weixiuneirong != null" >
+        WEIXIUNEIRONG = #{record.weixiuneirong,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update TABLE_TOTAL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      XINGHAO = #{record.xinghao,jdbcType=VARCHAR},
+      GUIGE = #{record.guige,jdbcType=VARCHAR},
+      SHULIANG = #{record.shuliang,jdbcType=DOUBLE},
+      DANWEI = #{record.danwei,jdbcType=VARCHAR},
+      SHENGCHANGCHANGJIA = #{record.shengchangchangjia,jdbcType=VARCHAR},
+      DANJIA = #{record.danjia,jdbcType=DOUBLE},
+      XINJIUCHENGDU = #{record.xinjiuchengdu,jdbcType=VARCHAR},
+      GOUZHIRIQI = #{record.gouzhiriqi,jdbcType=VARCHAR},
+      JIANDINGDANJIA = #{record.jiandingdanjia,jdbcType=DOUBLE},
+      JIANDINGDANWEI = #{record.jiandingdanwei,jdbcType=VARCHAR},
+      JIANDINGFEIHEJI = #{record.jiandingfeiheji,jdbcType=DOUBLE},
+      SHANGCIJIANDINGSJ = #{record.shangcijiandingsj,jdbcType=VARCHAR},
+      JIANDINGZHOUQI = #{record.jiandingzhouqi,jdbcType=VARCHAR},
+      TIGONGYIQIDANWEI = #{record.tigongyiqidanwei,jdbcType=VARCHAR},
+      YIWEIXIUCISHU = #{record.yiweixiucishu,jdbcType=INTEGER},
+      SHIFOUBAOXIUQI = #{record.shifoubaoxiuqi,jdbcType=VARCHAR},
+      WEIXIUDANWEI = #{record.weixiudanwei,jdbcType=VARCHAR},
+      WEIXIUFEIYONG = #{record.weixiufeiyong,jdbcType=DOUBLE},
+      importTime = #{record.importtime,jdbcType=VARCHAR},
+      WEIXIUNEIRONG = #{record.weixiuneirong,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update TABLE_TOTAL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      XINGHAO = #{record.xinghao,jdbcType=VARCHAR},
+      GUIGE = #{record.guige,jdbcType=VARCHAR},
+      SHULIANG = #{record.shuliang,jdbcType=DOUBLE},
+      DANWEI = #{record.danwei,jdbcType=VARCHAR},
+      SHENGCHANGCHANGJIA = #{record.shengchangchangjia,jdbcType=VARCHAR},
+      DANJIA = #{record.danjia,jdbcType=DOUBLE},
+      XINJIUCHENGDU = #{record.xinjiuchengdu,jdbcType=VARCHAR},
+      GOUZHIRIQI = #{record.gouzhiriqi,jdbcType=VARCHAR},
+      JIANDINGDANJIA = #{record.jiandingdanjia,jdbcType=DOUBLE},
+      JIANDINGDANWEI = #{record.jiandingdanwei,jdbcType=VARCHAR},
+      JIANDINGFEIHEJI = #{record.jiandingfeiheji,jdbcType=DOUBLE},
+      SHANGCIJIANDINGSJ = #{record.shangcijiandingsj,jdbcType=VARCHAR},
+      JIANDINGZHOUQI = #{record.jiandingzhouqi,jdbcType=VARCHAR},
+      TIGONGYIQIDANWEI = #{record.tigongyiqidanwei,jdbcType=VARCHAR},
+      YIWEIXIUCISHU = #{record.yiweixiucishu,jdbcType=INTEGER},
+      SHIFOUBAOXIUQI = #{record.shifoubaoxiuqi,jdbcType=VARCHAR},
+      WEIXIUDANWEI = #{record.weixiudanwei,jdbcType=VARCHAR},
+      WEIXIUFEIYONG = #{record.weixiufeiyong,jdbcType=DOUBLE},
+      importTime = #{record.importtime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="baseMachineMng.vo.TableTotal" >
+    update TABLE_TOTAL
+    <set >
+      <if test="projectId != null" >
+        PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="xinghao != null" >
+        XINGHAO = #{xinghao,jdbcType=VARCHAR},
+      </if>
+      <if test="guige != null" >
+        GUIGE = #{guige,jdbcType=VARCHAR},
+      </if>
+      <if test="shuliang != null" >
+        SHULIANG = #{shuliang,jdbcType=DOUBLE},
+      </if>
+      <if test="danwei != null" >
+        DANWEI = #{danwei,jdbcType=VARCHAR},
+      </if>
+      <if test="shengchangchangjia != null" >
+        SHENGCHANGCHANGJIA = #{shengchangchangjia,jdbcType=VARCHAR},
+      </if>
+      <if test="danjia != null" >
+        DANJIA = #{danjia,jdbcType=DOUBLE},
+      </if>
+      <if test="xinjiuchengdu != null" >
+        XINJIUCHENGDU = #{xinjiuchengdu,jdbcType=VARCHAR},
+      </if>
+      <if test="gouzhiriqi != null" >
+        GOUZHIRIQI = #{gouzhiriqi,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingdanjia != null" >
+        JIANDINGDANJIA = #{jiandingdanjia,jdbcType=DOUBLE},
+      </if>
+      <if test="jiandingdanwei != null" >
+        JIANDINGDANWEI = #{jiandingdanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingfeiheji != null" >
+        JIANDINGFEIHEJI = #{jiandingfeiheji,jdbcType=DOUBLE},
+      </if>
+      <if test="shangcijiandingsj != null" >
+        SHANGCIJIANDINGSJ = #{shangcijiandingsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jiandingzhouqi != null" >
+        JIANDINGZHOUQI = #{jiandingzhouqi,jdbcType=VARCHAR},
+      </if>
+      <if test="tigongyiqidanwei != null" >
+        TIGONGYIQIDANWEI = #{tigongyiqidanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="yiweixiucishu != null" >
+        YIWEIXIUCISHU = #{yiweixiucishu,jdbcType=INTEGER},
+      </if>
+      <if test="shifoubaoxiuqi != null" >
+        SHIFOUBAOXIUQI = #{shifoubaoxiuqi,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiudanwei != null" >
+        WEIXIUDANWEI = #{weixiudanwei,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiufeiyong != null" >
+        WEIXIUFEIYONG = #{weixiufeiyong,jdbcType=DOUBLE},
+      </if>
+      <if test="importtime != null" >
+        importTime = #{importtime,jdbcType=VARCHAR},
+      </if>
+      <if test="weixiuneirong != null" >
+        WEIXIUNEIRONG = #{weixiuneirong,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="baseMachineMng.vo.TableTotal" >
+    update TABLE_TOTAL
+    set PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      XINGHAO = #{xinghao,jdbcType=VARCHAR},
+      GUIGE = #{guige,jdbcType=VARCHAR},
+      SHULIANG = #{shuliang,jdbcType=DOUBLE},
+      DANWEI = #{danwei,jdbcType=VARCHAR},
+      SHENGCHANGCHANGJIA = #{shengchangchangjia,jdbcType=VARCHAR},
+      DANJIA = #{danjia,jdbcType=DOUBLE},
+      XINJIUCHENGDU = #{xinjiuchengdu,jdbcType=VARCHAR},
+      GOUZHIRIQI = #{gouzhiriqi,jdbcType=VARCHAR},
+      JIANDINGDANJIA = #{jiandingdanjia,jdbcType=DOUBLE},
+      JIANDINGDANWEI = #{jiandingdanwei,jdbcType=VARCHAR},
+      JIANDINGFEIHEJI = #{jiandingfeiheji,jdbcType=DOUBLE},
+      SHANGCIJIANDINGSJ = #{shangcijiandingsj,jdbcType=VARCHAR},
+      JIANDINGZHOUQI = #{jiandingzhouqi,jdbcType=VARCHAR},
+      TIGONGYIQIDANWEI = #{tigongyiqidanwei,jdbcType=VARCHAR},
+      YIWEIXIUCISHU = #{yiweixiucishu,jdbcType=INTEGER},
+      SHIFOUBAOXIUQI = #{shifoubaoxiuqi,jdbcType=VARCHAR},
+      WEIXIUDANWEI = #{weixiudanwei,jdbcType=VARCHAR},
+      WEIXIUFEIYONG = #{weixiufeiyong,jdbcType=DOUBLE},
+      importTime = #{importtime,jdbcType=VARCHAR},
+      WEIXIUNEIRONG = #{weixiuneirong,jdbcType=LONGVARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="baseMachineMng.vo.TableTotal" >
+    update TABLE_TOTAL
+    set PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      XINGHAO = #{xinghao,jdbcType=VARCHAR},
+      GUIGE = #{guige,jdbcType=VARCHAR},
+      SHULIANG = #{shuliang,jdbcType=DOUBLE},
+      DANWEI = #{danwei,jdbcType=VARCHAR},
+      SHENGCHANGCHANGJIA = #{shengchangchangjia,jdbcType=VARCHAR},
+      DANJIA = #{danjia,jdbcType=DOUBLE},
+      XINJIUCHENGDU = #{xinjiuchengdu,jdbcType=VARCHAR},
+      GOUZHIRIQI = #{gouzhiriqi,jdbcType=VARCHAR},
+      JIANDINGDANJIA = #{jiandingdanjia,jdbcType=DOUBLE},
+      JIANDINGDANWEI = #{jiandingdanwei,jdbcType=VARCHAR},
+      JIANDINGFEIHEJI = #{jiandingfeiheji,jdbcType=DOUBLE},
+      SHANGCIJIANDINGSJ = #{shangcijiandingsj,jdbcType=VARCHAR},
+      JIANDINGZHOUQI = #{jiandingzhouqi,jdbcType=VARCHAR},
+      TIGONGYIQIDANWEI = #{tigongyiqidanwei,jdbcType=VARCHAR},
+      YIWEIXIUCISHU = #{yiweixiucishu,jdbcType=INTEGER},
+      SHIFOUBAOXIUQI = #{shifoubaoxiuqi,jdbcType=VARCHAR},
+      WEIXIUDANWEI = #{weixiudanwei,jdbcType=VARCHAR},
+      WEIXIUFEIYONG = #{weixiufeiyong,jdbcType=DOUBLE},
+      importTime = #{importtime,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

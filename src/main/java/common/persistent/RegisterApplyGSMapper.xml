@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.RegisterApplyGSMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.RegisterApplyGS" >
+    <id column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_NAME" property="applyGsName" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_USER_NAME" property="applyGsUserName" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_USER_IDNUM" property="applyGsUserIdnum" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_USER_PHONE" property="applyGsUserPhone" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_USER_DESC" property="applyGsUserDesc" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_USER_EMAIL" property="applyGsUserEmail" jdbcType="VARCHAR" />
+    <result column="APPLY_GS_TIME" property="applyGsTime" jdbcType="TIMESTAMP" />
+    <result column="APPLY_IP" property="applyIp" jdbcType="VARCHAR" />
+    <result column="APPLY_STATE" property="applyState" jdbcType="INTEGER" />
+    <result column="REPLY_DETAIL" property="replyDetail" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    APPLY_ID, APPLY_GS_NAME, APPLY_GS_USER_NAME, APPLY_GS_USER_IDNUM, APPLY_GS_USER_PHONE, 
+    APPLY_GS_USER_DESC, APPLY_GS_USER_EMAIL, APPLY_GS_TIME, APPLY_IP, APPLY_STATE, REPLY_DETAIL
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.RegisterApplyGSExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from REGISTER_APPLY_GS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from REGISTER_APPLY_GS
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from REGISTER_APPLY_GS
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.RegisterApplyGSExample" >
+    delete from REGISTER_APPLY_GS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.RegisterApplyGS" >
+    insert into REGISTER_APPLY_GS (APPLY_ID, APPLY_GS_NAME, APPLY_GS_USER_NAME, 
+      APPLY_GS_USER_IDNUM, APPLY_GS_USER_PHONE, APPLY_GS_USER_DESC, 
+      APPLY_GS_USER_EMAIL, APPLY_GS_TIME, APPLY_IP, 
+      APPLY_STATE, REPLY_DETAIL)
+    values (#{applyId,jdbcType=VARCHAR}, #{applyGsName,jdbcType=VARCHAR}, #{applyGsUserName,jdbcType=VARCHAR}, 
+      #{applyGsUserIdnum,jdbcType=VARCHAR}, #{applyGsUserPhone,jdbcType=VARCHAR}, #{applyGsUserDesc,jdbcType=VARCHAR}, 
+      #{applyGsUserEmail,jdbcType=VARCHAR}, #{applyGsTime,jdbcType=TIMESTAMP}, #{applyIp,jdbcType=VARCHAR}, 
+      #{applyState,jdbcType=INTEGER}, #{replyDetail,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.RegisterApplyGS" >
+    insert into REGISTER_APPLY_GS
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="applyId != null" >
+        APPLY_ID,
+      </if>
+      <if test="applyGsName != null" >
+        APPLY_GS_NAME,
+      </if>
+      <if test="applyGsUserName != null" >
+        APPLY_GS_USER_NAME,
+      </if>
+      <if test="applyGsUserIdnum != null" >
+        APPLY_GS_USER_IDNUM,
+      </if>
+      <if test="applyGsUserPhone != null" >
+        APPLY_GS_USER_PHONE,
+      </if>
+      <if test="applyGsUserDesc != null" >
+        APPLY_GS_USER_DESC,
+      </if>
+      <if test="applyGsUserEmail != null" >
+        APPLY_GS_USER_EMAIL,
+      </if>
+      <if test="applyGsTime != null" >
+        APPLY_GS_TIME,
+      </if>
+      <if test="applyIp != null" >
+        APPLY_IP,
+      </if>
+      <if test="applyState != null" >
+        APPLY_STATE,
+      </if>
+      <if test="replyDetail != null" >
+        REPLY_DETAIL,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="applyId != null" >
+        #{applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsName != null" >
+        #{applyGsName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserName != null" >
+        #{applyGsUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserIdnum != null" >
+        #{applyGsUserIdnum,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserPhone != null" >
+        #{applyGsUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserDesc != null" >
+        #{applyGsUserDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserEmail != null" >
+        #{applyGsUserEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsTime != null" >
+        #{applyGsTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyIp != null" >
+        #{applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="applyState != null" >
+        #{applyState,jdbcType=INTEGER},
+      </if>
+      <if test="replyDetail != null" >
+        #{replyDetail,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.RegisterApplyGSExample" resultType="java.lang.Integer" >
+    select count(*) from REGISTER_APPLY_GS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update REGISTER_APPLY_GS
+    <set >
+      <if test="record.applyId != null" >
+        APPLY_ID = #{record.applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsName != null" >
+        APPLY_GS_NAME = #{record.applyGsName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsUserName != null" >
+        APPLY_GS_USER_NAME = #{record.applyGsUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsUserIdnum != null" >
+        APPLY_GS_USER_IDNUM = #{record.applyGsUserIdnum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsUserPhone != null" >
+        APPLY_GS_USER_PHONE = #{record.applyGsUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsUserDesc != null" >
+        APPLY_GS_USER_DESC = #{record.applyGsUserDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsUserEmail != null" >
+        APPLY_GS_USER_EMAIL = #{record.applyGsUserEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyGsTime != null" >
+        APPLY_GS_TIME = #{record.applyGsTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.applyIp != null" >
+        APPLY_IP = #{record.applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyState != null" >
+        APPLY_STATE = #{record.applyState,jdbcType=INTEGER},
+      </if>
+      <if test="record.replyDetail != null" >
+        REPLY_DETAIL = #{record.replyDetail,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update REGISTER_APPLY_GS
+    set APPLY_ID = #{record.applyId,jdbcType=VARCHAR},
+      APPLY_GS_NAME = #{record.applyGsName,jdbcType=VARCHAR},
+      APPLY_GS_USER_NAME = #{record.applyGsUserName,jdbcType=VARCHAR},
+      APPLY_GS_USER_IDNUM = #{record.applyGsUserIdnum,jdbcType=VARCHAR},
+      APPLY_GS_USER_PHONE = #{record.applyGsUserPhone,jdbcType=VARCHAR},
+      APPLY_GS_USER_DESC = #{record.applyGsUserDesc,jdbcType=VARCHAR},
+      APPLY_GS_USER_EMAIL = #{record.applyGsUserEmail,jdbcType=VARCHAR},
+      APPLY_GS_TIME = #{record.applyGsTime,jdbcType=TIMESTAMP},
+      APPLY_IP = #{record.applyIp,jdbcType=VARCHAR},
+      APPLY_STATE = #{record.applyState,jdbcType=INTEGER},
+      REPLY_DETAIL = #{record.replyDetail,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.RegisterApplyGS" >
+    update REGISTER_APPLY_GS
+    <set >
+      <if test="applyGsName != null" >
+        APPLY_GS_NAME = #{applyGsName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserName != null" >
+        APPLY_GS_USER_NAME = #{applyGsUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserIdnum != null" >
+        APPLY_GS_USER_IDNUM = #{applyGsUserIdnum,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserPhone != null" >
+        APPLY_GS_USER_PHONE = #{applyGsUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserDesc != null" >
+        APPLY_GS_USER_DESC = #{applyGsUserDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsUserEmail != null" >
+        APPLY_GS_USER_EMAIL = #{applyGsUserEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="applyGsTime != null" >
+        APPLY_GS_TIME = #{applyGsTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyIp != null" >
+        APPLY_IP = #{applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="applyState != null" >
+        APPLY_STATE = #{applyState,jdbcType=INTEGER},
+      </if>
+      <if test="replyDetail != null" >
+        REPLY_DETAIL = #{replyDetail,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.RegisterApplyGS" >
+    update REGISTER_APPLY_GS
+    set APPLY_GS_NAME = #{applyGsName,jdbcType=VARCHAR},
+      APPLY_GS_USER_NAME = #{applyGsUserName,jdbcType=VARCHAR},
+      APPLY_GS_USER_IDNUM = #{applyGsUserIdnum,jdbcType=VARCHAR},
+      APPLY_GS_USER_PHONE = #{applyGsUserPhone,jdbcType=VARCHAR},
+      APPLY_GS_USER_DESC = #{applyGsUserDesc,jdbcType=VARCHAR},
+      APPLY_GS_USER_EMAIL = #{applyGsUserEmail,jdbcType=VARCHAR},
+      APPLY_GS_TIME = #{applyGsTime,jdbcType=TIMESTAMP},
+      APPLY_IP = #{applyIp,jdbcType=VARCHAR},
+      APPLY_STATE = #{applyState,jdbcType=INTEGER},
+      REPLY_DETAIL = #{replyDetail,jdbcType=VARCHAR}
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,38 @@
+package baseMachineMng.persistent;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import baseMachineMng.vo.TableTotal;
+import baseMachineMng.vo.TableTotalExample;
+
+public interface TableTotalMapper {
+    int countByExample(TableTotalExample example);
+
+    int deleteByExample(TableTotalExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(TableTotal record);
+
+    int insertSelective(TableTotal record);
+
+    List<TableTotal> selectByExampleWithBLOBs(TableTotalExample example);
+
+    List<TableTotal> selectByExample(TableTotalExample example);
+
+    TableTotal selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") TableTotal record, @Param("example") TableTotalExample example);
+
+    int updateByExampleWithBLOBs(@Param("record") TableTotal record, @Param("example") TableTotalExample example);
+
+    int updateByExample(@Param("record") TableTotal record, @Param("example") TableTotalExample example);
+
+    int updateByPrimaryKeySelective(TableTotal record);
+
+    int updateByPrimaryKeyWithBLOBs(TableTotal record);
+
+    int updateByPrimaryKey(TableTotal record);
+}

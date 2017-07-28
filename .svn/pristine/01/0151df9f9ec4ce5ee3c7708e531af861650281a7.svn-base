@@ -1,0 +1,357 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>设备查询</title>
+<script type="text/javascript"> 
+var userID = '<%=request.getSession().getAttribute("userID")%>';
+    $(document).ready(function () {
+        //table加载
+        bootStrapTableInit();
+  
+        //点击查询后重新加载dataTable的数据
+        $("#query").click(function() {
+        	$('#tableD').bootstrapTable('destroy');
+        	bootStrapTableInit();
+        });
+       	 
+    	$('#addModal').on('hidden.bs.modal', function (e) {
+            $('#tableD').bootstrapTable('refresh');
+        });
+    	
+       $("#queryReset").click(function() {  
+           //赋空值
+           	$('#body').val("");
+			$('#begintimequery').val("");
+			$('#endtimequery').val("");
+			$('.form_datetime').datetimepicker('setStartDate', null);
+   		    $('.form_datetime').datetimepicker('setEndDate', null);
+       });
+       
+       $("#begintimequery").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$("#endtimequery").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$('#begintimequery').datetimepicker().on('changeDate', function(ev){
+  			$('#endtimequery').datetimepicker('setStartDate',$("#begintimequery").val());
+  		});
+  		$('#endtimequery').datetimepicker().on('changeDate', function(ev){
+  			$('#begintimequery').datetimepicker('setEndDate',$("#endtimequery").val());
+  		});
+    });
+    
+	function bootStrapTableInit() {
+		$('#tableD').bootstrapTable({
+			url: '<%=path%>/apply/listNewMachineApply.do',
+            method: 'get',
+            //toolbar: '#toolbar',    //工具按钮用哪个容器
+            striped: true,      //是否显示行间隔色
+            cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,     //是否显示分页（*）
+            sortable: true,      //是否启用排序
+            //pageNumber:1,      //初始化加载第一页，默认第一页
+            sortName:'applyDate',
+            sortOrder:'desc',
+            pageSize: 10,      //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],  //可供选择的每页的行数（*）
+            queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                                // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+            //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+            sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+            //search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            //strictSearch: true,
+            //showColumns: true,     //是否显示所有的列
+            //showRefresh: true,     //是否显示刷新按钮
+            //minimumCountColumns: 2,    //最少允许的列数
+            clickToSelect: true,    //是否启用点击选中行
+            queryParams : function(data) {
+            	data.body = $('#body').val();
+			    data.begintimequery=$('#begintimequery').val();
+			    data.endtimequery=$('#endtimequery').val();
+			    data.userID = userID;
+				return data;
+			},
+			onDblClickRow : function(row,$element,field) {
+				initsubTable(row.applyID);
+				$('#detailModal').modal('toggle');
+			},
+			columns : [{field : 'check_box', checkbox : true},
+					   {field : 'applyID', visible : false},
+					   {field : 'projectId', title : '项目名称', align: 'center'},
+					   {field : 'applyUser', title : '申请人', align: 'center'},
+					   {field : 'applyBody', title : '申请内容', align: 'center'},
+					   {field : 'applyReason', title : '申请原因', align: 'center'},
+					   {field : 'applyDate', title : '申请时间', align: 'center'},
+					   {field : 'remark', title : '备注', align: 'center'},
+					   {field : 'applyState', title : '审批状态', align: 'center',
+						   formatter: function(value,row,index){
+							   if(value=="0"){
+									return "待审批"
+							   }else if(value=="1"){
+								   return "已通过";
+							   }else{
+								   return "已拒绝";
+							   }
+						   }	   
+					   },
+					   {field : 'approvalDetail', title : '审批内容', align: 'center'},
+					   {field : 'approvalDate', title : '审批时间', align: 'center'},
+					   {field : '', title : '操作', align: 'center',formatter:function(value,row,index){ 
+						   var str = "<a href='javascript:void(0)' onclick=chakanMessageDetail('"+row.projectId+"','"+row.applyID+"'); >附件上传</a>&nbsp;&nbsp;";
+				  		   return str;
+					   }}
+					]
+        });
+	}
+	
+	function chakanMessageDetail(name,ID){
+		$("#Name").val(name);
+		$("#applyId").val(ID);
+		$('#updateModal').modal('toggle');
+	}
+	
+	function  openAdd() {
+		$('#addModal').modal('toggle');
+	}
+	
+	function uploadExcel() {
+		$("#instanceListHintDiv").hide();
+   	   	var selectobj = $('#tableD').bootstrapTable('getSelections');
+  	   	var length =  selectobj.length;
+        if (length == 1) {
+        	$("#appInfoID").val(selectobj[0].applyID);
+			$('#excelImportModal').modal('toggle');
+        } else if (length > 1){
+     	   instanceList_Hint(1,"只能选择其中1条数据上传！");
+        } else {
+     	   instanceList_Hint(1,"当前没有被选中的数据！");
+        }
+		
+	}
+	
+	function instanceList_Hint(hintType,hintInfo){
+		 messageCommonDiv(hintType, hintInfo, "instanceListBody","instanceListTitle","instanceListHintDiv");
+	}
+	//消息提醒
+	 function messageCommonDiv(iStatus, messageBody, bodyspan, titleSpan, messageDiv) {
+  	     $('#'+bodyspan).text(messageBody);
+  	     if (iStatus == 0) {
+  	         $('#'+titleSpan).text("成功：");
+  	         $('#'+messageDiv).removeClass("alert-warning").addClass(
+  	                 "alert-success");
+
+  	     } else if (iStatus == 1) {
+  	    	$('#'+titleSpan).text("警告：");
+  	    	$('#'+messageDiv).removeClass("alert-success").addClass(
+  	                 "alert-warning");
+  	     } else {
+  	     }
+  	     $('#'+messageDiv).show();
+  	 }
+
+  	 function MessageCommonDivHide(messageDiv) {
+  		 $('#'+messageDiv).hide();
+  	 }
+	//消息提醒结束
+    function initsubTable(id){
+    	$('#subtableD').bootstrapTable('destroy');
+        $('#subtableD').bootstrapTable({
+          	url: '<%=path%>/apply/listApplyDetail.do',
+            method: 'get',
+            //toolbar: '#toolbar',    //工具按钮用哪个容器
+            striped: true,      //是否显示行间隔色
+            cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,     //是否显示分页（*）
+            sortable: false,      //是否启用排序
+            //sortOrder: "asc",     //排序方式
+            //pageNumber:1,      //初始化加载第一页，默认第一页
+            pageSize: 100,      //每页的记录行数（*）
+            pageList: [10, 25, 50, 100,200],  //可供选择的每页的行数（*）
+            queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                                // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+            //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+            sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+            //search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            strictSearch: true,
+            //showColumns: true,     //是否显示所有的列
+            //showRefresh: true,     //是否显示刷新按钮
+            //minimumCountColumns: 2,    //最少允许的列数
+            clickToSelect: true,    //是否启用点击选中行
+		 	queryParams : function(data) {
+			    data.applyID = id;
+				return data;
+			},
+			columns : [
+			           {field : 'machineName', title : '设备名称', align: 'center'},
+					   {field : 'machineType', title : '设备型号', align: 'center'},
+					   {field : 'machineSize', title : '设备规格', align: 'center'},
+					   {field : 'machineNum', title : '设备数量', align: 'center'},
+					   {field : 'unit', title : '计量单位', align: 'center'},
+					   {field : 'producter', title : '生成厂家', align: 'center'},
+					   {field : 'applyReason', title : '申购原因', align: 'center'}
+					]
+		});
+    }
+	
+</script>
+</head>
+
+<body>
+	<div class="container" style="margin: 0 0 0 0 ;width: 100%;">
+		<div class="page-content-wrapper">
+		<ul class="breadcrumb" style="margin-bottom:0; font-size:12px;">  
+			<li>  设备管理 </li>  
+			<li class="active">新设备申请</li>
+		</ul>
+			<div class="page-content">
+				<div id="main" class="drmtable">
+					<div class="tjsx_title">条件筛选：</div>
+					<!-- message -->
+					<div id="instanceListHintDiv" class="alert alert-success alert-dismissible" style="display: none" role="alert">
+						<button type="button" onclick="MessageCommonDivHide('instanceListHintDiv')" class="close">
+							<span>&times;</span><span class="sr-only">关闭</span>
+						</button>
+						<strong><span id="instanceListTitle"></span></strong> 
+						<span id="instanceListBody"></span>
+					</div>
+					<!-- message -->
+					<div id="filter">
+						  <div class="filtrate_box clearfix"  style="margin-bottom: 3px" >
+						    <ul class="filtrate_list" >
+						       <li class="child_li first_sort bac_bl" >
+							        <div class="list_left">申请日期：</div>
+							        <div class="list_right" style="width:850px">
+							          <div class="list_content fix_list">
+							            <div class="col-md-3">
+											<input placeholder="开始时间" type="text" id="begintimequery" size="10" class="form-control form_datetime" name="begintimequery" readonly>
+										</div>
+							            <div class="col-md-3">
+											<input placeholder="结束时间" type="text" id="endtimequery" size="10" class="form-control form_datetime" name="endtimequery" readonly>
+										</div>  
+							          </div>
+								  	</div>
+						      </li> 					      
+						      
+						    <li class="child_li first_sort" name="sort-type-all">
+						        <div class="list_left">申请内容：</div>
+						        <div class="list_right  mig_top" style="width:850px">
+						          <div class="list_content fix_list">
+						           	<div class="col-md-3">
+										<input type="text" class="form-control" id="body" >
+									</div>
+									<button id="query" type="button" class="btn btn-info">
+									 查询 
+									</button>										
+									<button id="queryReset" type="button" class="btn btn-warning">
+									 重置 
+									</button>
+						          </div>
+						        </div>
+						      </li>
+						    </ul>
+						</div>
+						<div class="col-md-12 text-left page-offset">
+							<button type="button" class="btn btn-success"
+									data-toggle="modal" onclick="openAdd()">新增</button>
+							<a class="btn btn-info" href="<%=path%>/resource/newMachineApplyExcel.xlsx" download="">模板下载</a>
+							<button id="excelImport" type="button" class="btn btn-info" data-toggle="modal" onclick="uploadExcel()">导入Excel数据</button>
+						</div>
+					
+					<!-- Modal detail-->
+					<div class="modal fade" id="detailModal" tabindex="-1" role="dialog"
+						aria-labelledby="ApplyDetail" aria-hidden="true">
+						<div class="modal-dialog" style="width: 880px">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+									</button>
+									<h4 class="modal-title" id="ApplyDetail">【申请详情】</h4>
+								</div>
+								<div id="detailBody" class="modal-body">
+									<jsp:include page="applyDetail.jsp" />
+								</div>
+								 <div class="modal-footer">
+									  <button type="button" class="btn btn-default"
+									 	data-dismiss="modal">关闭</button>
+								 </div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal -->
+					
+					<!-- 附件上传 -->
+					<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+						<div class="modal-dialog" style="width: 880px">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+									</button>
+									<h4 class="modal-title" id="updateModalLabel">【附件上传】</h4>
+								</div>
+								<div id="updateTable" class="modal-body">
+									<jsp:include page="addUploadFile.jsp" />
+								</div>
+								<div class="modal-footer">
+									  <button type="button" class="btn btn-default"
+									 	data-dismiss="modal" >关闭</button>
+									 <button type="button" class="btn btn-primary" onclick="saveNewMessage()">保存</button>
+								 </div>
+							</div>
+						</div>
+					</div>
+						
+					<!-- Modal add-->
+					<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+						aria-labelledby="addModalLabel" aria-hidden="true">
+						<div class="modal-dialog" style="width: 880px">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+									</button>
+									<h4 class="modal-title" id="addModalLabel">【新增申请】</h4>
+								</div>
+								<div class="modal-body">
+									<jsp:include page="machineApply.jsp"></jsp:include>
+								</div>
+								 <div class="modal-footer">
+									  <button type="button" class="btn btn-default"
+									 	data-dismiss="modal">关闭</button>
+									 <button type="button" class="btn btn-primary" onclick="addsave()">保存</button>
+								 </div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal -->
+					
+				<!-- Modal excelImport-->
+					<div class="modal fade" id="excelImportModal" tabindex="-1" role="dialog"
+						aria-labelledby="excelImportModalLabel" aria-hidden="true" data-backdrop="static">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div id="excelImportModalBody" class="modal-body" style="padding-top: 0;padding-bottom: 0">
+									<jsp:include page="newMachineExcelUpload.jsp"></jsp:include>
+								</div>
+						</div>
+						</div>	
+					</div>
+					<!-- Modal -->
+					
+					<!-- table -->
+					<div id="bodyFrame">
+						<table id="tableD" data-click-to-select="true" class="table table-condensed">
+							<thead style="background:#ace4ff;">
+								<tr></tr>
+							</thead>
+						</table>
+					</div>
+					<!-- table -->
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="uploadFile.persistent.FILEUPLOADMapper" >
+  <resultMap id="BaseResultMap" type="uploadFile.vo.FILEUPLOAD" >
+    <id column="FILE_ID" property="fileId" jdbcType="VARCHAR" />
+    <result column="UPLOAD_USERID" property="uploadUserid" jdbcType="VARCHAR" />
+    <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+    <result column="FILE_DESC" property="fileDesc" jdbcType="VARCHAR" />
+    <result column="UPLOAD_TIME" property="uploadTime" jdbcType="VARCHAR" />
+    <result column="FILE_ADDRESS" property="fileAddress" jdbcType="VARCHAR" />
+    <result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="FILE_TYPE" property="fileType" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    FILE_ID, UPLOAD_USERID, FILE_NAME, FILE_DESC, UPLOAD_TIME, FILE_ADDRESS, PROJECT_ID, 
+    FILE_TYPE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="uploadFile.vo.FILEUPLOADExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from FILE_UPLOAD
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FILE_UPLOAD
+    where FILE_ID = #{fileId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from FILE_UPLOAD
+    where FILE_ID = #{fileId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="uploadFile.vo.FILEUPLOADExample" >
+    delete from FILE_UPLOAD
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="uploadFile.vo.FILEUPLOAD" >
+    insert into FILE_UPLOAD (FILE_ID, UPLOAD_USERID, FILE_NAME, 
+      FILE_DESC, UPLOAD_TIME, FILE_ADDRESS, 
+      PROJECT_ID, FILE_TYPE)
+    values (#{fileId,jdbcType=VARCHAR}, #{uploadUserid,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, 
+      #{fileDesc,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR}, #{fileAddress,jdbcType=VARCHAR}, 
+      #{projectId,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="uploadFile.vo.FILEUPLOAD" >
+    insert into FILE_UPLOAD
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="fileId != null" >
+        FILE_ID,
+      </if>
+      <if test="uploadUserid != null" >
+        UPLOAD_USERID,
+      </if>
+      <if test="fileName != null" >
+        FILE_NAME,
+      </if>
+      <if test="fileDesc != null" >
+        FILE_DESC,
+      </if>
+      <if test="uploadTime != null" >
+        UPLOAD_TIME,
+      </if>
+      <if test="fileAddress != null" >
+        FILE_ADDRESS,
+      </if>
+      <if test="projectId != null" >
+        PROJECT_ID,
+      </if>
+      <if test="fileType != null" >
+        FILE_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="fileId != null" >
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadUserid != null" >
+        #{uploadUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileDesc != null" >
+        #{fileDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null" >
+        #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileAddress != null" >
+        #{fileAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null" >
+        #{fileType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="uploadFile.vo.FILEUPLOADExample" resultType="java.lang.Integer" >
+    select count(*) from FILE_UPLOAD
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update FILE_UPLOAD
+    <set >
+      <if test="record.fileId != null" >
+        FILE_ID = #{record.fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uploadUserid != null" >
+        UPLOAD_USERID = #{record.uploadUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileName != null" >
+        FILE_NAME = #{record.fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileDesc != null" >
+        FILE_DESC = #{record.fileDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uploadTime != null" >
+        UPLOAD_TIME = #{record.uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileAddress != null" >
+        FILE_ADDRESS = #{record.fileAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectId != null" >
+        PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileType != null" >
+        FILE_TYPE = #{record.fileType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update FILE_UPLOAD
+    set FILE_ID = #{record.fileId,jdbcType=VARCHAR},
+      UPLOAD_USERID = #{record.uploadUserid,jdbcType=VARCHAR},
+      FILE_NAME = #{record.fileName,jdbcType=VARCHAR},
+      FILE_DESC = #{record.fileDesc,jdbcType=VARCHAR},
+      UPLOAD_TIME = #{record.uploadTime,jdbcType=VARCHAR},
+      FILE_ADDRESS = #{record.fileAddress,jdbcType=VARCHAR},
+      PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      FILE_TYPE = #{record.fileType,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="uploadFile.vo.FILEUPLOAD" >
+    update FILE_UPLOAD
+    <set >
+      <if test="uploadUserid != null" >
+        UPLOAD_USERID = #{uploadUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileDesc != null" >
+        FILE_DESC = #{fileDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null" >
+        UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileAddress != null" >
+        FILE_ADDRESS = #{fileAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null" >
+        FILE_TYPE = #{fileType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where FILE_ID = #{fileId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="uploadFile.vo.FILEUPLOAD" >
+    update FILE_UPLOAD
+    set UPLOAD_USERID = #{uploadUserid,jdbcType=VARCHAR},
+      FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      FILE_DESC = #{fileDesc,jdbcType=VARCHAR},
+      UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      FILE_ADDRESS = #{fileAddress,jdbcType=VARCHAR},
+      PROJECT_ID = #{projectId,jdbcType=VARCHAR},
+      FILE_TYPE = #{fileType,jdbcType=VARCHAR}
+    where FILE_ID = #{fileId,jdbcType=VARCHAR}
+  </update>
+  
+   <resultMap id="projectVO" type="common.vo.Project" >
+    <id column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="getProjectByGS" parameterType="java.lang.String" resultMap="projectVO">
+  	    select PROJECT_ID,PROJECT_NAME from PROJECT where COMPANY_ID = #{userID}
+  </select>
+  
+   <select id="getProjectByGYS" parameterType="java.lang.String" resultMap="projectVO">
+  		select PROJECT_ID,PROJECT_NAME from PROJECT where PROJECT_ID in
+  		( select XM_USER_ID FROM XM_GYS WHERE GYS_USER_ID =#{userID})
+  </select>
+  
+   <select id="getProjectByXM" parameterType="java.lang.String" resultMap="projectVO">
+  		select PROJECT_ID,PROJECT_NAME from PROJECT where PROJECT_ID = #{userID}
+  </select>
+  
+  <select id="getProjectAll" parameterType="java.lang.String" resultMap="projectVO">
+  		select PROJECT_ID,PROJECT_NAME from PROJECT 
+  </select>
+  
+</mapper>

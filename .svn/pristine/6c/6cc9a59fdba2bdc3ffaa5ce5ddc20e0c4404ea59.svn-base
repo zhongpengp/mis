@@ -1,0 +1,67 @@
+package supplierMng.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import common.persistent.GS_GYSMapper;
+import common.persistent.SupplierMapper;
+import common.persistent.UserVOMapper;
+import common.persistent.XM_GYSMapper;
+import common.vo.GS_GYS;
+import common.vo.GS_GYSExample;
+import common.vo.XM_GYSExample;
+import supplierMng.vo.SuppliersRetuenVO;
+
+@Service
+public class SupplierService {
+
+	@Autowired
+	private SupplierMapper supplierMapper;
+	@Autowired
+	private UserVOMapper userVOMapper;
+	@Autowired
+	private GS_GYSMapper gs_GYSMapper;
+	@Autowired
+	private XM_GYSMapper xm_GYSMapper;
+
+	public List<SuppliersRetuenVO> getCompanySuppliers(String companyID) {
+		return supplierMapper.getCompanySuppliers(companyID);
+	}
+
+	public void addCompanySuppliersByIDs(String companyID, List<String> supplierIDs) {
+		for (String supplierID : supplierIDs) {
+			try {
+				GS_GYS vo = new GS_GYS();
+				vo.setGsUserId(companyID);
+				vo.setGysUserId(supplierID);
+				vo.setApplyState(1);
+				gs_GYSMapper.insert(vo);
+			} catch (Exception e) {
+				continue;
+			}
+
+		}
+	}
+
+	public List<SuppliersRetuenVO> getCompanyNotOwnerSuppliers(String companyID) {
+		return supplierMapper.getCompanyNotOwnerSuppliers(companyID);
+	}
+
+	public void reReplyCompanySuppliersByID(String companyID, String supplierID) {
+		gs_GYSMapper.reReplyCompanySuppliersByID(companyID,supplierID);
+	}
+
+	public void removeCompanySuppliersByID(String companyID, List<String> list) {
+		//删除公司-供应商信息
+		GS_GYSExample gs_gysExample = new GS_GYSExample();
+		gs_gysExample.createCriteria().andGsUserIdEqualTo(companyID).andGysUserIdIn(list);
+		gs_GYSMapper.deleteByExample(gs_gysExample);
+		
+		//删除项目-供应商信息
+		xm_GYSMapper.removeProjectSuppliersByCompanyID(companyID,list);
+	}
+	
+
+}

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.MessageVOMapper" >
+	<resultMap id="messageVo" type="common.vo.MessageVO" >
+	    <result column="MESSAGE_ID" property="messageId" jdbcType="VARCHAR" />
+	    <result column="SEND_USERID" property="sendUserId" jdbcType="VARCHAR" />
+	    <result column="RECEIVE_USERID" property="recevieUserId" jdbcType="VARCHAR" />
+	    <result column="SEND_TIME" property="sendTime" jdbcType="VARCHAR" />
+	    <result column="MESSAGE_SEND" property="messageSend" jdbcType="VARCHAR" />
+	    <result column="ATTACHMENT_SEND" property="attachmentSend" jdbcType="VARCHAR" />
+	    <result column="MESSAGE_REPLY" property="messageReply" jdbcType="VARCHAR" />
+	    <result column="ATTACHMENT_REPLY" property="attachmentReply" jdbcType="VARCHAR" />
+	    <result column="IS_RECEIVER_READ" property="isRecevierRead" jdbcType="VARCHAR" />
+	    <result column="MESSAGE_THEME" property="messageTheme" jdbcType="VARCHAR" />
+	    <result column="SENDPROJECTNAME" property="sendProjectName" jdbcType="VARCHAR" />
+	    <result column="RECEVIEPROJECTNAME" property="recevieProjectName" jdbcType="VARCHAR" />
+	    <result column="IS_READ" property="isRead" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="projectVOMap" type="common.vo.Project" >
+	    <result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+	    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+	    <result column="PROJECT_DETAIL" property="projectDetail" jdbcType="VARCHAR" />
+	    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
+	    <result column="PROJECT_STATUE" property="projectStatue" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="BaseResultMap" type="common.vo.UserVO" >
+		<id column="USER_ID" property="userId" jdbcType="VARCHAR" />
+		<result column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+		<result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+		<result column="SEX" property="sex" jdbcType="VARCHAR" />
+		<result column="BIRTHDAY" property="birthday" jdbcType="VARCHAR" />
+		<result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR" />
+		<result column="LOGIN_PASSWORD" property="loginPassword" jdbcType="VARCHAR" />
+		<result column="USER_STATUE" property="userStatue" jdbcType="VARCHAR" />
+		<result column="USER_TYPE" property="userType" jdbcType="VARCHAR" />
+		<result column="PHONE_NUM" property="phoneNum" jdbcType="VARCHAR" />
+		<result column="PROJECT_STATUE" property="projectStatue" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="getMessageByUserId" parameterType="java.util.Map" resultMap="messageVo">
+		select t1.*,t2.LOGIN_NAME as SENDPROJECTNAME,t3.LOGIN_NAME as RECEVIEPROJECTNAME
+			from MESSAGE t1
+			left join USER t2
+			on t1.SEND_USERID = t2.USER_ID
+			left join USER t3
+			on t1.RECEIVE_USERID = t3.USER_ID
+		where 1=1
+		<if test="receveUser!=null and receveUser!=''">
+			and t1.RECEIVE_USERID = #{receveUser}
+		</if>
+		<if test="sendUser!=null and sendUser!=''">
+			and t1.SEND_USERID = #{sendUser}
+		</if>
+		<if test="startTime!=null and startTime!=''">
+			and left(t1.SEND_TIME,10) &gt;= #{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			and left(t1.SEND_TIME,10) &lt;= #{endTime}
+		</if>
+		<if test="messageTheme!=null and messageTheme!=''">
+			and t1.MESSAGE_THEME like '%${messageTheme}%'
+		</if>
+		order by t1.SEND_TIME desc,MESSAGE_ID
+	</select>
+	
+	<select id="selectProjectInfoByUserType" parameterType="java.util.Map" resultMap="projectVOMap">
+		select * from PROJECT p where p.PROJECT_ID in (select u.USER_ID from USER u where u.USER_TYPE !=#{usertype})
+	</select>
+	<insert id="insertNewMessage" parameterType="java.util.Map">
+		insert into MESSAGE (MESSAGE_ID,SEND_USERID,RECEIVE_USERID,SEND_TIME,MESSAGE_THEME,MESSAGE_SEND,ATTACHMENT_SEND,IS_RECEIVER_READ,IS_READ) values
+			(#{messageId},#{sendUserId},#{recevieUserId},#{sendTime},#{messageTheme},#{messageSend},#{attachmentSend},#{isRecevierRead},#{isRead})
+	</insert>
+	<select id="getUserByGS" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select * from USER where USER_ID in(
+			SELECT t2.GYS_USER_ID as userID
+			from COMPANY t1
+			LEFT JOIN GS_GYS t2
+			on t1.GS_ID=t2.GS_USER_ID
+			where t1.GS_ID=#{userID}
+			union 
+			select t3.PROJECT_ID as userID
+			from PROJECT t3
+			where t3.COMPANY_ID=#{userID})
+	</select>
+	<select id="getUserByXM" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select * from USER u where u.USER_ID =(
+		select t.COMPANY_ID from PROJECT t where t.PROJECT_ID=#{userID})
+	</select>
+	<select id="getUserByGYS" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select * from USER u where u.USER_ID in(
+		  SELECT t2.GYS_USER_ID 
+			from COMPANY t1
+			LEFT JOIN GS_GYS t2
+			on t1.GS_ID=t2.GS_USER_ID
+			where t1.GS_ID=#{userID)
+	</select>
+	<update id="recevieMessage" parameterType="java.util.Map">
+		UPDATE MESSAGE set MESSAGE_REPLY = #{messageReply},ATTACHMENT_REPLY =#{attachmentReply},IS_RECEIVER_READ = #{isRecevierRead} where MESSAGE_ID = #{messageId}
+	</update>
+	
+	<update id="updateMsgRead" parameterType="java.util.Map">
+		UPDATE MESSAGE set IS_READ = #{isRead} where MESSAGE_ID = #{msgId}
+	</update>
+	
+</mapper>

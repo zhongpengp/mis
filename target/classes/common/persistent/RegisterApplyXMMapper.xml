@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.RegisterApplyXMMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.RegisterApplyXM" >
+    <id column="APPLY_ID" property="applyId" jdbcType="VARCHAR" />
+    <result column="APPLIER_NAME" property="applierName" jdbcType="VARCHAR" />
+    <result column="IDCARD_NUM" property="idcardNum" jdbcType="VARCHAR" />
+    <result column="PHONE_NUM" property="phoneNum" jdbcType="VARCHAR" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="PROJECT_DETAIL" property="projectDetail" jdbcType="VARCHAR" />
+    <result column="APPLY_TIME" property="applyTime" jdbcType="TIMESTAMP" />
+    <result column="APPLY_STATUE" property="applyStatue" jdbcType="VARCHAR" />
+    <result column="APPLY_IP" property="applyIp" jdbcType="VARCHAR" />
+    <result column="APPROVAL_DETAIL" property="approvalDetail" jdbcType="VARCHAR" />
+    <result column="APPROVAL_DATE" property="approvalDate" jdbcType="TIMESTAMP" />
+    <result column="APPROVAL_USERID" property="approvalUserid" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+    <result column="PROJECT_TYPE" property="projectType" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    APPLY_ID, APPLIER_NAME, IDCARD_NUM, PHONE_NUM, PROJECT_NAME, PROJECT_DETAIL, APPLY_TIME, 
+    APPLY_STATUE, APPLY_IP, APPROVAL_DETAIL, APPROVAL_DATE, APPROVAL_USERID, EMAIL, PROJECT_TYPE, 
+    COMPANY_ID
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.RegisterApplyXMExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from REGISTER_APPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from REGISTER_APPLY
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from REGISTER_APPLY
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.RegisterApplyXMExample" >
+    delete from REGISTER_APPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.RegisterApplyXM" >
+    insert into REGISTER_APPLY (APPLY_ID, APPLIER_NAME, IDCARD_NUM, 
+      PHONE_NUM, PROJECT_NAME, PROJECT_DETAIL, 
+      APPLY_TIME, APPLY_STATUE, APPLY_IP, 
+      APPROVAL_DETAIL, APPROVAL_DATE, APPROVAL_USERID, 
+      EMAIL, PROJECT_TYPE, COMPANY_ID
+      )
+    values (#{applyId,jdbcType=VARCHAR}, #{applierName,jdbcType=VARCHAR}, #{idcardNum,jdbcType=VARCHAR}, 
+      #{phoneNum,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{projectDetail,jdbcType=VARCHAR}, 
+      #{applyTime,jdbcType=TIMESTAMP}, #{applyStatue,jdbcType=VARCHAR}, #{applyIp,jdbcType=VARCHAR}, 
+      #{approvalDetail,jdbcType=VARCHAR}, #{approvalDate,jdbcType=TIMESTAMP}, #{approvalUserid,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{projectType,jdbcType=VARCHAR}, #{companyId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.RegisterApplyXM" >
+    insert into REGISTER_APPLY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="applyId != null" >
+        APPLY_ID,
+      </if>
+      <if test="applierName != null" >
+        APPLIER_NAME,
+      </if>
+      <if test="idcardNum != null" >
+        IDCARD_NUM,
+      </if>
+      <if test="phoneNum != null" >
+        PHONE_NUM,
+      </if>
+      <if test="projectName != null" >
+        PROJECT_NAME,
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL,
+      </if>
+      <if test="applyTime != null" >
+        APPLY_TIME,
+      </if>
+      <if test="applyStatue != null" >
+        APPLY_STATUE,
+      </if>
+      <if test="applyIp != null" >
+        APPLY_IP,
+      </if>
+      <if test="approvalDetail != null" >
+        APPROVAL_DETAIL,
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE,
+      </if>
+      <if test="approvalUserid != null" >
+        APPROVAL_USERID,
+      </if>
+      <if test="email != null" >
+        EMAIL,
+      </if>
+      <if test="projectType != null" >
+        PROJECT_TYPE,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="applyId != null" >
+        #{applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardNum != null" >
+        #{idcardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNum != null" >
+        #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        #{applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyStatue != null" >
+        #{applyStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="applyIp != null" >
+        #{applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDetail != null" >
+        #{approvalDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        #{approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalUserid != null" >
+        #{approvalUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.RegisterApplyXMExample" resultType="java.lang.Integer" >
+    select count(*) from REGISTER_APPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update REGISTER_APPLY
+    <set >
+      <if test="record.applyId != null" >
+        APPLY_ID = #{record.applyId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applierName != null" >
+        APPLIER_NAME = #{record.applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.idcardNum != null" >
+        IDCARD_NUM = #{record.idcardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phoneNum != null" >
+        PHONE_NUM = #{record.phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectDetail != null" >
+        PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyTime != null" >
+        APPLY_TIME = #{record.applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.applyStatue != null" >
+        APPLY_STATUE = #{record.applyStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyIp != null" >
+        APPLY_IP = #{record.applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approvalDetail != null" >
+        APPROVAL_DETAIL = #{record.approvalDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approvalDate != null" >
+        APPROVAL_DATE = #{record.approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.approvalUserid != null" >
+        APPROVAL_USERID = #{record.approvalUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.email != null" >
+        EMAIL = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectType != null" >
+        PROJECT_TYPE = #{record.projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.companyId != null" >
+        COMPANY_ID = #{record.companyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update REGISTER_APPLY
+    set APPLY_ID = #{record.applyId,jdbcType=VARCHAR},
+      APPLIER_NAME = #{record.applierName,jdbcType=VARCHAR},
+      IDCARD_NUM = #{record.idcardNum,jdbcType=VARCHAR},
+      PHONE_NUM = #{record.phoneNum,jdbcType=VARCHAR},
+      PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      APPLY_TIME = #{record.applyTime,jdbcType=TIMESTAMP},
+      APPLY_STATUE = #{record.applyStatue,jdbcType=VARCHAR},
+      APPLY_IP = #{record.applyIp,jdbcType=VARCHAR},
+      APPROVAL_DETAIL = #{record.approvalDetail,jdbcType=VARCHAR},
+      APPROVAL_DATE = #{record.approvalDate,jdbcType=TIMESTAMP},
+      APPROVAL_USERID = #{record.approvalUserid,jdbcType=VARCHAR},
+      EMAIL = #{record.email,jdbcType=VARCHAR},
+      PROJECT_TYPE = #{record.projectType,jdbcType=VARCHAR},
+      COMPANY_ID = #{record.companyId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.RegisterApplyXM" >
+    update REGISTER_APPLY
+    <set >
+      <if test="applierName != null" >
+        APPLIER_NAME = #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardNum != null" >
+        IDCARD_NUM = #{idcardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNum != null" >
+        PHONE_NUM = #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        APPLY_TIME = #{applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="applyStatue != null" >
+        APPLY_STATUE = #{applyStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="applyIp != null" >
+        APPLY_IP = #{applyIp,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDetail != null" >
+        APPROVAL_DETAIL = #{approvalDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalUserid != null" >
+        APPROVAL_USERID = #{approvalUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        PROJECT_TYPE = #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID = #{companyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.RegisterApplyXM" >
+    update REGISTER_APPLY
+    set APPLIER_NAME = #{applierName,jdbcType=VARCHAR},
+      IDCARD_NUM = #{idcardNum,jdbcType=VARCHAR},
+      PHONE_NUM = #{phoneNum,jdbcType=VARCHAR},
+      PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      APPLY_TIME = #{applyTime,jdbcType=TIMESTAMP},
+      APPLY_STATUE = #{applyStatue,jdbcType=VARCHAR},
+      APPLY_IP = #{applyIp,jdbcType=VARCHAR},
+      APPROVAL_DETAIL = #{approvalDetail,jdbcType=VARCHAR},
+      APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      APPROVAL_USERID = #{approvalUserid,jdbcType=VARCHAR},
+      EMAIL = #{email,jdbcType=VARCHAR},
+      PROJECT_TYPE = #{projectType,jdbcType=VARCHAR},
+      COMPANY_ID = #{companyId,jdbcType=VARCHAR}
+    where APPLY_ID = #{applyId,jdbcType=VARCHAR}
+  </update>
+</mapper>

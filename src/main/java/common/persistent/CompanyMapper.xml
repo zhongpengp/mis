@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.CompanyMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.Company" >
+    <id column="GS_ID" property="gsId" jdbcType="VARCHAR" />
+    <result column="GS_NAME" property="gsName" jdbcType="VARCHAR" />
+    <result column="GS_DESC" property="gsDesc" jdbcType="VARCHAR" />
+    <result column="GS_STATE" property="gsState" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    GS_ID, GS_NAME, GS_DESC, GS_STATE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.CompanyExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from COMPANY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from COMPANY
+    where GS_ID = #{gsId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from COMPANY
+    where GS_ID = #{gsId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.CompanyExample" >
+    delete from COMPANY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.Company" >
+    insert into COMPANY (GS_ID, GS_NAME, GS_DESC, 
+      GS_STATE)
+    values (#{gsId,jdbcType=VARCHAR}, #{gsName,jdbcType=VARCHAR}, #{gsDesc,jdbcType=VARCHAR}, 
+      #{gsState,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.Company" >
+    insert into COMPANY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gsId != null" >
+        GS_ID,
+      </if>
+      <if test="gsName != null" >
+        GS_NAME,
+      </if>
+      <if test="gsDesc != null" >
+        GS_DESC,
+      </if>
+      <if test="gsState != null" >
+        GS_STATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gsId != null" >
+        #{gsId,jdbcType=VARCHAR},
+      </if>
+      <if test="gsName != null" >
+        #{gsName,jdbcType=VARCHAR},
+      </if>
+      <if test="gsDesc != null" >
+        #{gsDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="gsState != null" >
+        #{gsState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.CompanyExample" resultType="java.lang.Integer" >
+    select count(*) from COMPANY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update COMPANY
+    <set >
+      <if test="record.gsId != null" >
+        GS_ID = #{record.gsId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gsName != null" >
+        GS_NAME = #{record.gsName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gsDesc != null" >
+        GS_DESC = #{record.gsDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gsState != null" >
+        GS_STATE = #{record.gsState,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update COMPANY
+    set GS_ID = #{record.gsId,jdbcType=VARCHAR},
+      GS_NAME = #{record.gsName,jdbcType=VARCHAR},
+      GS_DESC = #{record.gsDesc,jdbcType=VARCHAR},
+      GS_STATE = #{record.gsState,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.Company" >
+    update COMPANY
+    <set >
+      <if test="gsName != null" >
+        GS_NAME = #{gsName,jdbcType=VARCHAR},
+      </if>
+      <if test="gsDesc != null" >
+        GS_DESC = #{gsDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="gsState != null" >
+        GS_STATE = #{gsState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where GS_ID = #{gsId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.Company" >
+    update COMPANY
+    set GS_NAME = #{gsName,jdbcType=VARCHAR},
+      GS_DESC = #{gsDesc,jdbcType=VARCHAR},
+      GS_STATE = #{gsState,jdbcType=INTEGER}
+    where GS_ID = #{gsId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,144 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+var userID = '<%=request.getSession().getAttribute("userID")%>';
+var userName = '<%=request.getSession().getAttribute("userName")%>';
+var userType = '<%=request.getSession().getAttribute("userType")%>';
+$(function(){
+	initprojectTable();
+});
+function initprojectTable(){
+	$("#projectTable").bootstrapTable("destroy");
+	$("#projectTable").bootstrapTable({
+		url: '<%=path%>/projectMng/getProjectList',
+		method: 'get',
+       //toolbar: '#toolbar',    //工具按钮用哪个容器
+       striped: true,      //是否显示行间隔色
+       cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+       pagination: true,     //是否显示分页（*）
+       maintainSelected:true,//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+       //sortable: false,      //是否启用排序
+       //sortOrder: "asc",     //排序方式
+       sortName:'studentCode',
+       pageNumber:1,      //初始化加载第一页，默认第一页
+       pageSize:10,
+       pageList: [10, 20, 30, 50],  //可供选择的每页的行数（*）
+       queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                           // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+       //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+       sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+       search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+       //showColumns: true,     //是否显示所有的列
+       //showRefresh: true,     //是否显示刷新按钮
+       clickToSelect: true,    //是否启用点击选中行
+       showColumns:true,
+       showExport:true,
+       exportTypes:['excel', 'doc',  'pdf', 'png', 'xml', 'csv', 'txt', 'sql','json'],
+		queryParams : function(data) {
+		    data.projectName=$("#projectName").val();
+		    data.projectStatue=$("#projectStatue").val();
+			return data;
+		},
+		onLoadSuccess:function(data){
+			//initStudentGradeDetailTable(data);
+		},
+		columns : [
+				//{field : 'check_box', checkbox : true},
+			    {field : 'projectID',  visible : false},
+			    {field : 'projectName', title : '项目名称', visible : true},
+			    {field : 'projectStatue', title : '项目状态', visible : true,
+			    	formatter:function(value,row,index){
+			    		if(value=="0"){
+			    			return "<font color='black'>未开始</font>";
+			    		}else if(value=="1"){
+			    			return "<font color='red'>已取消</font>";
+			    		}else if(value=="2"){
+			    			return "<font color='blue'>进行中</font>";
+			    		}else if(value=="3"){
+			    			return "<font color='green'>已完成</font>";
+			    		}else if(value=="4"){
+			    			return "<font color='red'>已注销</font>";
+			    		}
+			    	} },
+			    {field : 'userName', title : '负责人', visible : true},
+			    {field : 'phoneNum', title : '联系电话', visible : true},
+			    {field : 'email', title : '联系邮箱', visible : true},
+			    {field : 'projectDetail', title : '项目简介', visible : true},
+			    {field : 'operation', title : '操作', visible : true,
+			    	formatter:function(value,row,index){
+			    		if(row.projectStatue=="3"){
+			    			return "<a href='#' onclick=logoutProject('"+row.projectID+"','"+row.projectName+"'); >注销项目</a>";
+			    		}else {
+			    			return "<font color='black'>不可操作</font>";
+			    		}
+			    	} 
+			    }
+		]
+	});
+}
+function logoutProject(projectID,projectName){
+	var dialogInstance = BootstrapDialog.show({
+		title:'注销项目',
+		type:'type-danger',
+		closable:false,
+		message:'您即将注销项目:'+projectName+',注销后该项目账号将不能再登录本系统！是否确认注销？',
+		buttons:[
+			{
+				label:'取消',
+				action:function(dialog){
+					dialog.close();
+				}
+			},
+			{
+				 icon: 'glyphicon glyphicon-trash',
+				 label:'确认注销',
+				 cssClass:'btn-danger',
+				 autospan:true,
+				 action:function(dialog){
+					 dialog.enableButtons(false);
+					 dialog.setClosable(false);
+					 $.ajax({
+						url:'<%=path%>/projectMng/logoutProject',
+						data:{
+							'projectID':projectID
+						},
+						success:function(data){
+							initprojectTable();
+							dialogInstance.close();
+							BootstrapDialog.alert({
+								title:'注销项目',
+								message:'项目注销成功！',
+								type:'type-success',
+								size:'size-small'
+							});
+						}
+					 });
+				 }
+			}
+			
+		]
+	});
+}
+</script>
+</head>
+<body>
+<div class="container" style="margin: 0 0 0 0 ;width: 98%;">
+		<div class="row">
+			<div class="col-sm-12" style="width: 100%">
+				<div id="toolbar" class="btn-group">
+					<div align="center"><font id="tableTitle" style="font-size: large;font-weight: bold;"></font></div>
+				</div>
+				<table id="projectTable" class="table table-condensed" data-toolbar="#toolbar"data-toggle="table" data-striped="true" data-search="true"  data-show-columns="true">
+					<thead style="background-color: #87CEFF"></thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

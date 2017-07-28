@@ -1,0 +1,42 @@
+package common.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import common.service.ApprovalRegisterService;
+import common.vo.RegisterApplyGS;
+import common.vo.RegisterApplyQueryVO_gs;
+
+@Controller
+@RequestMapping("/approvalRegisterController")
+@EnableWebMvc
+public class ApprovalRegisterController {
+	
+	@Autowired
+	private ApprovalRegisterService approvalRegisterService;
+
+	@ResponseBody
+	@RequestMapping("getRegisterApplyList_gs")
+	public List<RegisterApplyGS> getRegisterApplyList_gs(RegisterApplyQueryVO_gs vo) {
+		return approvalRegisterService.getRegisterApplyList_gs(vo);
+	}
+	
+	@ResponseBody
+	@RequestMapping("getApplyByID")
+	public RegisterApplyGS getApplyByID(String applyID) {
+		return approvalRegisterService.getApplyByID(applyID);
+	}
+	
+	@ResponseBody
+	@RequestMapping("approvalApply_gs")
+	public void approvalApply_gs(String applyID,String applyState,String replyDetail) {
+		approvalRegisterService.approvalApply_gs(applyID,applyState,replyDetail);
+	}
+	
+	
+}

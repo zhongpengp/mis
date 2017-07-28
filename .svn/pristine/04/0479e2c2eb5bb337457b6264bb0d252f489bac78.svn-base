@@ -1,0 +1,144 @@
+package baseMachineMng.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import baseMachineMng.persistent.Project_Instrument_InfoMapper;
+import baseMachineMng.persistent.Project_Instrument_Info_TempMapper;
+import baseMachineMng.vo.ImportProjectMachineInfoReturnVO;
+import baseMachineMng.vo.Project_Instrument_Info_Temp;
+import baseMachineMng.vo.Project_Instrument_Info_TempExample;
+import util.UUID_Util;
+
+@Service
+public class ProjectMachineImportService {
+
+	@Autowired
+	private Project_Instrument_Info_TempMapper project_Instrument_Info_TempMapper;
+	@Autowired
+	private Project_Instrument_InfoMapper project_Instrument_InfoMapper;
+
+	public List<ImportProjectMachineInfoReturnVO> getImportedProjectMachineInfo(String supplierID) {
+		return project_Instrument_Info_TempMapper.getImportedProjectMachineInfo(supplierID);
+	}
+
+	public ArrayList<String[]> insertMachine_temp(ArrayList<String[]> s, String projectID, String supplierID) {
+		ArrayList<String[]> resultMessage = new ArrayList<>();
+		if (s.size() == 0) {
+			String messgae[] = new String[2];
+			messgae[0] = "设备信息导入失败！";
+			messgae[1] = "未从Excel中读取到数据！";
+			resultMessage.add(messgae);
+		} else {
+			int index = 0;
+			int successIndex = 0;
+			int errorIndex = 0;
+			for (String machineInfo[] : s) {
+				String errLog = "";
+				index++;
+				String messgae[] = new String[2];
+				boolean hasError = false;
+				if ("设备".equals(machineInfo[0]) || "耗材".equals(machineInfo[0])) {
+				} else {
+					hasError = true;
+					errLog += "【设备类型不正确，只能填写“设备”或“耗材”】";
+				}
+				if (machineInfo[1] == null || machineInfo[1].equals("")) {
+					hasError = true;
+					errLog += "【设备名称不可为空】";
+				}
+				if (machineInfo[2] == null || machineInfo[2].equals("")) {
+					hasError = true;
+					errLog += "【设备型号不可为空】";
+				}
+				if (machineInfo[3] == null || machineInfo[3].equals("")) {
+					hasError = true;
+					errLog += "【设备规格不可为空】";
+				}
+				if (machineInfo[4] == null || machineInfo[4].equals("")) {
+					hasError = true;
+					errLog += "【设备数量不可为空】";
+				} else {
+					try {
+						double num = Double.valueOf(machineInfo[4]);
+					} catch (Exception e) {
+						hasError = true;
+						errLog += "【设备数量不正确，请填写数字】";
+					}
+				}
+				if (machineInfo[6] == null || machineInfo[6].equals("")) {
+					hasError = true;
+					errLog += "【计量单位不可为空】";
+				}
+				if (machineInfo[7] == null || machineInfo[7].equals("")) {
+					hasError = true;
+					errLog += "【生产厂家不可为空】";
+				}
+				if (machineInfo[8] == null || machineInfo[8].equals("")) {
+					hasError = true;
+					errLog += "【设备单价不可为空】";
+				} else {
+					try {
+						double num = Double.valueOf(machineInfo[8]);
+					} catch (Exception e) {
+						hasError = true;
+						errLog += "【设备单价不正确，请填写数字】";
+					}
+				}
+				if (hasError) {
+					errorIndex++;
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：" + "【类型：" + machineInfo[0] + "】【名称：" + machineInfo[1] + "】【型号：" + machineInfo[2]
+							+ "】【规格：" + machineInfo[3] + "】【数量：" + machineInfo[4] + "】【单价：" + machineInfo[8] + "】"
+							+ "【该行数据存在问题，请检查后重新导入该行数据！】具体错误如下：" + errLog;
+					resultMessage.add(messgae);
+					continue;
+				}
+				Project_Instrument_Info_Temp machine = new Project_Instrument_Info_Temp();
+				try {
+					machine.init(machineInfo, projectID, supplierID);
+					project_Instrument_Info_TempMapper.insert(machine);
+					successIndex++;
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "成功：【类型：" + machineInfo[0] + "】【名称：" + machineInfo[1] + "】【型号：" + machineInfo[2]
+							+ "】【规格：" + machineInfo[3] + "】【数量：" + machineInfo[4] + "】【单价：" + machineInfo[8] + "】";
+					resultMessage.add(messgae);
+				} catch (Exception e) {
+					errorIndex++;
+					System.out.println(e);
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：【类型：" + machineInfo[0] + "】【名称：" + machineInfo[1] + "】【型号：" + machineInfo[2]
+							+ "】【规格：" + machineInfo[3] + "】【数量：" + machineInfo[4] + "】【单价：" + machineInfo[8]
+							+ "】【数据异常，请修改Excel数据后重试，或手动录入该条记录】详细异常：" + e.getMessage();
+					resultMessage.add(messgae);
+					continue;
+				}
+			}
+			String resultAll[] = new String[2];
+			resultAll[0] = "所有数据处理完毕";
+			resultAll[1] = "所有数据处理完毕，共处理" + s.size() + "条数据###成功" + successIndex + "条，失败" + errorIndex + "条。";
+			resultMessage.add(resultAll);
+		}
+		return resultMessage;
+	}
+
+	public List<Project_Instrument_Info_Temp> getImportedMachineDetail(String supplierID, String projectID,
+			String applyState) {
+		Project_Instrument_Info_TempExample example = new Project_Instrument_Info_TempExample();
+		example.createCriteria().andSupplierIdEqualTo(supplierID).andProjectIdEqualTo(projectID)
+				.andApplyStateEqualTo(Integer.valueOf(applyState));
+		return project_Instrument_Info_TempMapper.selectByExample(example);
+	}
+
+	public void addSingleMachine(Project_Instrument_Info_Temp vo) {
+		vo.setId(UUID_Util.getUUID());
+		vo.setApplyTime(new Date());
+		vo.setApplyState(1);
+		project_Instrument_Info_TempMapper.insert(vo);
+	}
+
+}

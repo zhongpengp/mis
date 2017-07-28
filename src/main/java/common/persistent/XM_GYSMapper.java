@@ -1,0 +1,38 @@
+package common.persistent;
+
+import common.vo.XM_GYS;
+import common.vo.XM_GYSExample;
+import common.vo.XM_GYSKey;
+import supplierMng.vo.SuppliersRetuenVO;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface XM_GYSMapper {
+    int countByExample(XM_GYSExample example);
+
+    int deleteByExample(XM_GYSExample example);
+
+    int deleteByPrimaryKey(XM_GYSKey key);
+
+    int insert(XM_GYS record);
+
+    int insertSelective(XM_GYS record);
+
+    List<XM_GYS> selectByExample(XM_GYSExample example);
+
+    XM_GYS selectByPrimaryKey(XM_GYSKey key);
+
+    int updateByExampleSelective(@Param("record") XM_GYS record, @Param("example") XM_GYSExample example);
+
+    int updateByExample(@Param("record") XM_GYS record, @Param("example") XM_GYSExample example);
+
+    int updateByPrimaryKeySelective(XM_GYS record);
+
+    int updateByPrimaryKey(XM_GYS record);
+
+	void removeProjectSuppliersByCompanyID(String companyID, List<String> list);
+
+	void reReplyProjectSuppliersByID(String projectID, String supplierID);
+
+}

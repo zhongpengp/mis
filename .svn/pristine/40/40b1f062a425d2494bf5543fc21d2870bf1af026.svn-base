@@ -1,0 +1,66 @@
+package common.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import common.vo.Project;
+import uploadFile.persistent.FILEUPLOADMapper;
+import uploadFile.vo.FILEUPLOAD;
+import uploadFile.vo.FILEUPLOADExample;
+import uploadFile.vo.FILEUPLOADExample.Criteria;
+
+
+@Service
+public class FileServiceImpl implements FileService {
+	
+	@Autowired
+	private  FILEUPLOADMapper fileMapper;
+	
+	@Override
+	public List<Project> getProjectInfo(String userType,String userID) {
+		if("1".equals(userType)){ //公司
+			return fileMapper.getProjectByGS(userID);
+		}else if("2".equals(userType)){ //项目
+			return fileMapper.getProjectByXM(userID);
+		}else if ("3".equals(userType)){ //供应商
+			return fileMapper.getProjectByGYS(userID);
+		}else if ("4".equals(userType)){
+			return fileMapper.getProjectAll();
+		}
+		return null;
+	}
+
+	@Override
+	public void addNewFile(FILEUPLOAD fileVO) {
+		fileMapper.insert(fileVO);
+	}
+
+	@Override
+	public List<FILEUPLOAD> getFileList(String userType, String fileType, String startTime, String endTime,
+			String projectId) {
+		FILEUPLOADExample example = new FILEUPLOADExample();
+		example.clear();
+		Criteria riteria = example.createCriteria();
+		if("2".equals(userType)&&(fileType==null||"".equals(fileType))){
+			List<String> list = new ArrayList<String>();
+			list.add("0");
+			list.add("1");
+			riteria.andFileTypeIn(list);
+		}
+		if(fileType!=null&&!"".equals(fileType)){
+			riteria.andFileTypeEqualTo(fileType);
+		}
+		if(!"".equals(startTime)){
+			riteria.andUploadUseridGreaterThanOrEqualTo(startTime);
+		}
+		if(!"".equals(endTime)){
+			riteria.andUploadTimeLessThanOrEqualTo(endTime);
+		}
+		riteria.andProjectIdEqualTo(projectId);
+		List<FILEUPLOAD> list = fileMapper.selectByExample(example);
+		return list;
+	}
+	
+}

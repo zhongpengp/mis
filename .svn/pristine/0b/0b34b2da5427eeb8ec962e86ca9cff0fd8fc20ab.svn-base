@@ -1,0 +1,191 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+	String path = request.getContextPath();
+	response.setHeader("Pragma","No-cache");    
+	response.setHeader("Cache-Control","no-cache");    
+	response.setDateHeader("Expires", 0);  
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+
+<title>用户申请</title>
+</head>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		 $('#addApplyForm_gys').validate({  
+	           errorElement : 'span',  
+	           errorClass : 'help-block',  
+	           focusInvalid : false,  
+	           rules : { 
+	        	   applyName : {required : true,applyName:true},  
+	        	   applyUserName : {required : true, maxlength : 100},  
+	        	   applyUserIdnum : {required : true, maxlength : 100,userid:true},
+	        	   applyUserPhone : {required : true, maxlength : 100,phone:true},  
+	        	   applyUserEmail : {required : true, maxlength : 100,mail:true},
+	        	   applyDesc : { maxlength : 1000},
+	           },  
+	           
+	           messages : {  
+	        	   applyUserName : {required : "负责人姓名必填", maxlength : "最大长度100"},  
+	        	   applyUserIdnum : {required : "负责人身份证号必填", maxlength : "最大长度100"},
+	        	   applyUserPhone : {required : "负责人电话必填", maxlength : "最大长度100"},  
+	        	   applyUserEmail : {required : "负责人邮箱必填", maxlength :"最大长度100"},
+	        	   applyName : {required : "供应商名称必填", maxlength : "最大长度100"},
+	        	   applyDesc : { maxlength : "最大长度1000"},
+	           }, 
+	  
+	           highlight : function(element) {  
+	               $(element).closest('.data-validate').addClass('has-error');  
+	           },  
+	 
+	           success : function(label) {  
+	               label.closest('.data-validate').removeClass('has-error');  
+	               label.remove();  
+	           },  
+	 
+	           errorPlacement : function(error, element) {  
+	               element.parent('div').append(error);  
+	           },
+	 
+	     }); 
+		 
+		 $.validator.addMethod("applyName", function(value, element){
+			 var re ;
+			 $.ajax({
+				    url:"<%=path %>/apply/validateGys_name",    
+				    dataType:"json",   //返回格式为json
+				    async:false,//请求是否异步，默认为异步，这也是ajax重要特性
+				    data:{"name":value},    //参数值
+				    type:"GET",   
+				    success:function(data){
+				    	re = data;
+				    },
+				    error:function(){
+				    }
+				});
+      	     return this.optional(element) || (re==0);     
+         }, "该供应商名称已存在，请修改");
+		 
+		 $.validator.addMethod("userid", function(value, element){
+			 var re=/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+      	     return this.optional(element) || (re.test(value));     
+         }, "身份证格式错误");
+		 
+		 $.validator.addMethod("mail", function(value, element){
+			 var re=/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+      	     return this.optional(element) || (re.test(value));     
+         }, "邮箱格式错误");
+		 
+		 $.validator.addMethod("phone", function(value, element){
+			 var re = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0-9]))\d{8}$/;
+      	     return this.optional(element) || (re.test(value));     
+         }, "电话号码格式错误");
+		 
+		
+	  });
+	  
+	function saveApply_gys() {
+		  //表单验证
+		 if ($('#addApplyForm_gys').validate().form()){
+		      $.ajax({
+		          url : "<%=path %>/apply/register_gys",
+		          data : $('#addApplyForm_gys').serialize(),
+		          type : "post",
+		          success : function(data) {
+		        	  $("#registerModal").hide();
+		        	  var email = $("#applyUserEmail").val();
+		        	  BootstrapDialog.alert({
+		  	            title: '提交注册申请',
+		  	            message: '提交成功!审批结果将通过邮件方式发送至您的邮箱：'+email+'，请注意查收。',
+		  	           // size:'size-small',
+		  	            type:'type-success', // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+		  	            closable: true, // <-- Default value is false
+		  	            draggable: true, // <-- Default value is false
+		  	            buttonLabel: '确定', // <-- Default value is 'OK',
+		  	            callback: function(result) {
+							window.location.href="<%=path%>/index.jsp";
+		  	            }
+		  	        });
+		          },
+		          error : function(request) {
+		        	  BootstrapDialog.alert({
+			  	            title: '提交注册申请',
+			  	            message: '提交失败!请重试。',
+			  	           // size:'size-small',
+			  	            type:'type-danger', // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+			  	            closable: true, // <-- Default value is false
+			  	            draggable: true, // <-- Default value is false
+			  	            buttonLabel: '确定', // <-- Default value is 'OK',
+			  	            callback: function(result) {
+								window.location.href="<%=path%>/index.jsp";
+			  	            }
+			  	        });
+		          }
+		      });
+			 
+		 }
+	}  	  
+</script>
+
+<body>
+	<!-- message -->
+	<div id="addFieldDiv_gys">
+		<form id="addApplyForm_gys" class="form-horizontal" role="form">
+			<div class="form-group">
+				<label for="applyName" class="col-md-3 control-label"> 供应商名称  </label>
+				<div class="col-md-9 data-validate">
+					<input type="text" class="form-control" name="applyName" placeholder="填写供应商名称"
+						id="addApplyForm_gys_name" > 
+				</div>
+			</div>	
+			
+			<div class="form-group" id ="divAdd1">
+				<label for="applyUserName" class="col-md-3 control-label"> 负责人 </label>
+				<div class="col-md-9 data-validate">
+					<input type="text" class="form-control" name="applyUserName" placeholder="填写申请人的中文名"
+						id="addApplyForm_gys_user" >
+				</div>
+			</div>	
+			<div class="form-group" id ="divAdd2">
+				<label for="applyUserIdnum" class="col-md-3 control-label"> 身份证号 </label>
+				<div class="col-md-9 data-validate">
+					<input type="text" class="form-control" name="applyUserIdnum" placeholder="填写申请人身份证号"
+						id="addApplyForm_gys_userID" >
+				</div>
+			</div>
+			
+			<div class="form-group" id ="divAdd3">
+				<label for="applyUserPhone" class="col-md-3 control-label"> 联系电话 </label>
+				<div class="col-md-9 data-validate">
+					<input type="text" name="applyUserPhone"  placeholder="填写申请人联系电话" class="form-control" >
+				</div>
+			</div>
+			
+			<div class="form-group" id ="divAdd3">
+				<label for="applyUserEmail" class="col-md-3 control-label"> 邮箱 </label>
+				<div class="col-md-9 data-validate">
+					<input type="text" name="applyUserEmail" id="applyUserEmail" placeholder="填写申请人邮箱" class="form-control" >
+				</div>
+			</div>
+			
+			
+			<div class="form-group" id ="divAdd4">
+				<label for="applyDesc" class="col-md-3 control-label"> 供应商简介 </label>
+				<div class="col-md-9 data-validate">
+					<textarea name="applyDesc" id="applyDesc" rows="3"  placeholder="填写申请项目描述" class="form-control" ></textarea>
+				</div>
+			</div>
+			
+			<div class="form-group" align="center">
+				<button type="reset" class="btn btn-default">重置</button>
+				<button type="button" class="btn btn-primary" onclick="saveApply_gys()">提交</button>
+			</div>
+		</form>
+	</div>
+	
+</body>
+</html>

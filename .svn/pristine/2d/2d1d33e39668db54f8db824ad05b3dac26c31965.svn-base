@@ -1,0 +1,183 @@
+package baseMachineMng.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import baseMachineMng.persistent.TableTotalMapper;
+import baseMachineMng.vo.TableTotal;
+import baseMachineMng.vo.TableTotalExample;
+import baseMachineMng.vo.TableTotalExample.Criteria;
+import common.vo.applyMachineInfoVO;
+import log.persistent.ApplyMapper;
+
+@Service
+public class TableTotalService {
+
+	@Autowired
+	private TableTotalMapper tableTotalMapper;
+	@Autowired
+	private ApplyMapper applyMapper; 
+	
+	public ArrayList<String[]> addInfo(ArrayList<String[]> s, String projectID) {
+		ArrayList<String[]> resultMessage = new ArrayList<>();
+		if (s.size() == 0) {
+			String messgae[] = new String[2];
+			messgae[0] = "设备信息导入失败！";
+			messgae[1] = "未从Excel中读取到数据！";
+			resultMessage.add(messgae);
+		} else {
+			int index = 0;
+			int successIndex = 0;
+			int errorIndex = 0;
+			for (String grade[] : s) {
+				index++;
+				String messgae[] = new String[2];
+				boolean hasEmpty = false;
+				for (String string : grade) {
+					if (string.equals("")) {
+						hasEmpty = true;
+						break;
+					}
+				}
+				if (hasEmpty) {
+					errorIndex++;
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：【该行记录存在空值，请检查】";
+					resultMessage.add(messgae);
+					continue;
+				}
+				TableTotal tableTatol = new TableTotal();
+				try {
+					tableTatol.init(grade, projectID);
+					int num = tableTatol.getShuliang().intValue();
+					for (int i = 0; i < num; i++) {
+						tableTatol.setShuliang(Double.valueOf(1));
+						tableTotalMapper.insert(tableTatol);
+						tableTatol.init(grade, projectID);
+					}
+					successIndex++;
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "成功：【名称：" + grade[0] + "】【规格：" + grade[1] + "】【型号：" + grade[2] + "】【数量：" + grade[3]
+							+ "】";
+					resultMessage.add(messgae);
+				} catch (Exception e) {
+					errorIndex++;
+					System.out.println(e);
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：【数据异常，请修改Excel数据后重试，或手动录入该条记录】详细异常：" + e.getMessage();
+					resultMessage.add(messgae);
+					continue;
+				}
+			}
+			String resultAll[] = new String[2];
+			resultAll[0] = "所有数据处理完毕";
+			resultAll[1] = "所有数据处理完毕，共处理" + s.size() + "条数据###成功" + successIndex + "条，失败" + errorIndex + "条。";
+			resultMessage.add(resultAll);
+		}
+		return resultMessage;
+	}
+
+	public List<TableTotal> searchMachineByForm(TableTotal tableTotal, String gouzhiriqi1, String gouzhiriqi2,
+			String daoruxitongriqi1, String daoruxitongriqi2, String shebeimingchengjingquechaxun) {
+		TableTotalExample example = new TableTotalExample();
+		example.clear();
+		Criteria riteria = example.createCriteria();
+		String shengchangchangjia = tableTotal.getShengchangchangjia();
+		String tigongyiqidanwei = tableTotal.getTigongyiqidanwei();
+		String xinjiuchengdu = tableTotal.getXinjiuchengdu();
+		String shifoubaoxiuqi = tableTotal.getShifoubaoxiuqi();
+		String name = tableTotal.getName();
+		if (shengchangchangjia != null && !shengchangchangjia.equals("")) {
+			riteria.andShengchangchangjiaIn(Arrays.asList(shengchangchangjia.split(",|，")));
+		}
+		if (tigongyiqidanwei != null && !tigongyiqidanwei.equals("")) {
+			riteria.andTigongyiqidanweiIn(Arrays.asList(tigongyiqidanwei.split(",|，")));
+		}
+		if ("all".equals(xinjiuchengdu)) {
+			riteria.andXinjiuchengduIsNotNull();
+		} else {
+			riteria.andXinjiuchengduEqualTo(xinjiuchengdu);
+		}
+		if ("all".equals(shifoubaoxiuqi)) {
+			riteria.andShifoubaoxiuqiIsNotNull();
+		} else {
+			riteria.andShifoubaoxiuqiEqualTo(xinjiuchengdu);
+		}
+		if (name != null && !name.equals("")) {
+			if ("1".equals(shebeimingchengjingquechaxun)) {
+				riteria.andNameEqualTo(name);
+			} else {
+				riteria.andNameLike(name);
+			}
+		}
+		if (gouzhiriqi1 != null && !gouzhiriqi1.equals("")) {
+			riteria.andGouzhiriqiGreaterThanOrEqualTo(gouzhiriqi1);
+		}
+		if (gouzhiriqi2 != null && !gouzhiriqi2.equals("")) {
+			riteria.andGouzhiriqiLessThanOrEqualTo(gouzhiriqi2);
+		}
+		if (daoruxitongriqi1 != null && !daoruxitongriqi1.equals("")) {
+			riteria.andImporttimeGreaterThanOrEqualTo(gouzhiriqi1);
+		}
+		if (daoruxitongriqi2 != null && !daoruxitongriqi2.equals("")) {
+			riteria.andImporttimeLessThanOrEqualTo(gouzhiriqi2);
+		}
+		return tableTotalMapper.selectByExample(example);
+	}
+
+	public ArrayList<String[]> applyMachineInfo(ArrayList<String[]> data, String applyID) {
+		
+		ArrayList<String[]> resultMessage = new ArrayList<>();
+		if (data.size() == 0) {
+			String messgae[] = new String[2];
+			messgae[0] = "申请设备信息导入失败！";
+			messgae[1] = "未从Excel中读取到数据！";
+			resultMessage.add(messgae);
+		} else {
+			int index = 0;
+			int successIndex = 0;
+			int errorIndex = 0;
+			for (String grade[] : data) {
+				index++;
+				String messgae[] = new String[2];
+				boolean hasEmpty = false;
+				for (String string : grade) {
+					if (string.equals("")) {
+						hasEmpty = true;
+						break;
+					}
+				}
+				if (hasEmpty) {
+					errorIndex++;
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：【该行记录存在空值，请检查】";
+					resultMessage.add(messgae);
+					continue;
+				}
+				applyMachineInfoVO tableTatol = new applyMachineInfoVO();
+				try {
+					tableTatol.init(grade, applyID);
+					applyMapper.addApplyMachineInfo(tableTatol);
+					successIndex++;
+				} catch (Exception e) {
+					errorIndex++;
+					System.out.println(e);
+					messgae[0] = "处理第" + index + "条数据-->";
+					messgae[1] = "失败：【数据异常，请修改Excel数据后重试，或手动录入该条记录】详细异常：" + e.getMessage();
+					resultMessage.add(messgae);
+					continue;
+				}
+			}
+			String resultAll[] = new String[2];
+			resultAll[0] = "所有数据处理完毕";
+			resultAll[1] = "所有数据处理完毕，共处理" + data.size() + "条数据###成功" + successIndex + "条，失败" + errorIndex + "条。";
+			resultMessage.add(resultAll);
+		}
+		return resultMessage;
+	}
+}

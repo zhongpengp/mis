@@ -1,0 +1,201 @@
+package common.controller;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import common.service.ApplyService;
+import common.vo.Company;
+import common.vo.RegisterApplyGS;
+import common.vo.RegisterApplyGYS;
+import common.vo.RegisterApplyXM;
+import common.vo.UserVO;
+import common.vo.applyMachineInfoVO;
+import common.vo.newMachineApplyVO;
+import common.vo.registerUserVO;
+import util.IpUtil;
+
+@Controller
+@RequestMapping("/apply")
+@EnableWebMvc
+public class ApplyController {
+	@Autowired
+	private ApplyService appService;
+
+	@ResponseBody
+	@RequestMapping("/register") // 用户注册申请
+	public void applyUser(registerUserVO vo, HttpServletRequest request) {
+		String IP = IpUtil.getIpAddress(request);
+		vo.setApplyIP(IP);
+		appService.saveApply(vo);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/initCompanySelectOption") //
+	public List<Company> initCompanySelectOption() {
+		return appService.initCompanySelectOption();
+	}
+
+	@ResponseBody
+	@RequestMapping("/register_gys") // 用户注册申请
+	public void register_gys(RegisterApplyGYS vo, HttpServletRequest request) {
+		String IP = IpUtil.getIpAddress(request);
+		vo.setApplyIp(IP);
+		String id = UUID.randomUUID().toString().replaceAll("-", "");
+		vo.setApplyId(id);
+		vo.setApplyDate(new Date());
+		vo.setApplyState(1);
+//		System.out.println(vo);
+		appService.saveApply_gys(vo);
+	}
+	@ResponseBody
+	@RequestMapping("/register_xm") // 用户注册申请
+	public void register_xm(RegisterApplyXM vo, HttpServletRequest request) {
+		String IP = IpUtil.getIpAddress(request);
+		vo.setApplyIp(IP);
+		String id = UUID.randomUUID().toString().replaceAll("-", "");
+		vo.setApplyId(id);
+		vo.setApplyTime(new Date());
+		vo.setApplyStatue("1");
+//		System.out.println(vo);
+		appService.register_xm(vo);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/register_gs") // 用户注册申请
+	public void register_gs(RegisterApplyGS vo, HttpServletRequest request) {
+		String IP = IpUtil.getIpAddress(request);
+		vo.setApplyIp(IP);
+		String id = UUID.randomUUID().toString().replaceAll("-", "");
+		vo.setApplyId(id);
+		vo.setApplyGsTime(new Date());
+		vo.setApplyState(1);
+//		System.out.println(vo);
+		appService.register_gs(vo);
+	}
+
+	@ResponseBody
+	@RequestMapping("/applyList")
+	public Map<String, Object> applyList(String startTime, String endTime, String approveStatus) {
+		List<registerUserVO> list = appService.listApply(startTime, endTime, approveStatus);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+
+	}
+	
+	@ResponseBody
+	@RequestMapping("/applyCompanyList")
+	public Map<String, Object> applyComplyList(String startTime, String endTime, String approveStatus) {
+		List<RegisterApplyGS> list = appService.listCompanyApply(startTime, endTime, approveStatus);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+
+	}
+
+	@ResponseBody
+	@RequestMapping("/approve") // 审批
+	public void approve(registerUserVO vo) {
+		appService.saveApprove(vo);
+
+	}
+
+	@ResponseBody
+	@RequestMapping("/validate") // 校验用户名是否存在
+	public int validate(String name) {
+		return appService.validate(name);
+	}
+
+	@ResponseBody
+	@RequestMapping("/validateXM_name") // 校验项目名是否存在
+	public int validateProject(String name) {
+		return appService.validateXM_name(name);
+	}
+
+	@ResponseBody
+	@RequestMapping("/validateGys_name") // 校验项目名是否存在
+	public int validateGys_name(String name) {
+		return appService.validateGys_name(name);
+	}
+	@ResponseBody
+	@RequestMapping("/validateGS_Name") // 校验项目名是否存在
+	public int validateGS_Name(String name) {
+		return appService.validateGS_Name(name);
+	}
+
+	@ResponseBody
+	@RequestMapping("/getUserInfo") // 获取用户信息
+	public Map<String, String> getUserInfo(String userID) {
+		return appService.getUserInfo(userID);
+	}
+
+	@ResponseBody
+	@RequestMapping("/saveUserInfo") // 保存用户信息
+	public void saveUserInfo(UserVO vo) {
+		appService.saveUserInfo(vo);
+	}
+
+	@ResponseBody
+	@RequestMapping("/getProjectInfo") // 获取项目信息
+	public Map<String, String> getProjectInfo(String projectID) {
+		return appService.getProjectInfo(projectID);
+	}
+
+	@ResponseBody
+	@RequestMapping("/updateProject") // 更新项目信息
+	public void updateProject(String projectID, String projectDESC, String step) {
+		appService.updateProject(projectID, projectDESC, step);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/newMachine") // 新设备申请
+	public void newMachineApply(newMachineApplyVO vo) {
+		appService.newMachineApply(vo);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/getApplyUserInfo") // 新设备申请
+	public Map<String, String> getApplyUserInfo(String userID) {
+		Map<String, String> map = appService.getApplyUserInfo(userID);
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/listNewMachineApply")
+	public Map<String, Object> listNewMachineApply(String begintimequery,String endtimequery,String body,String userID){
+		List<newMachineApplyVO> list = appService.listNewMachineApply(begintimequery, endtimequery,body,userID);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/UpdateMachineApply") 
+	public void UpdateMachineApply(String applyID, String filePath) {
+		appService.UpdateMachineApply(applyID,filePath);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/listApplyDetail") 
+	public Map<String, Object> listApplyDetail(String applyID) {
+		List<applyMachineInfoVO> list = appService.listApplyDetail(applyID);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+}

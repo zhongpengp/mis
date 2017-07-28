@@ -1,0 +1,280 @@
+package baseMachineMng.vo;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+public class TableTotal {
+	private String id;
+
+	private String projectId;
+
+	private String name;
+
+	private String xinghao;
+
+	private String guige;
+
+	private Double shuliang;
+
+	private String danwei;
+
+	private String shengchangchangjia;
+
+	private Double danjia;
+
+	private String xinjiuchengdu;
+
+	private String gouzhiriqi;
+
+	private Double jiandingdanjia;
+
+	private String jiandingdanwei;
+
+	private Double jiandingfeiheji;
+
+	private String shangcijiandingsj;
+
+	private String jiandingzhouqi;
+
+	private String tigongyiqidanwei;
+
+	private Integer yiweixiucishu;
+
+	private String shifoubaoxiuqi;
+
+	private String weixiudanwei;
+
+	private Double weixiufeiyong;
+
+	private String importtime;
+
+	private String weixiuneirong;
+
+	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	public void init(String[] s, String projectID2) {
+		this.id = UUID.randomUUID().toString().replaceAll("-", "");
+		this.projectId = projectID2;
+		this.name = s[0];
+		this.xinghao = s[1];
+		this.guige = s[2];
+		this.shuliang = Double.valueOf(s[3]);
+		this.danwei = s[4];
+		this.shengchangchangjia = s[5];
+		this.danjia = Double.valueOf(s[6]);
+		this.xinjiuchengdu = s[7];
+		this.gouzhiriqi = s[8];
+		this.jiandingdanwei = s[9];
+		this.jiandingdanjia = Double.valueOf(s[10]);
+		this.shangcijiandingsj = s[11];
+		this.jiandingzhouqi = s[12];
+		this.tigongyiqidanwei = s[13];
+		this.yiweixiucishu = Integer.valueOf(s[14]);
+		this.shifoubaoxiuqi = s[15];
+		this.weixiudanwei = s[16];
+		this.weixiufeiyong = Double.valueOf(s[17]);
+		this.weixiuneirong = s[18];
+		this.importtime = format.format(new Date(System.currentTimeMillis()));
+
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getXinghao() {
+		return xinghao;
+	}
+
+	public void setXinghao(String xinghao) {
+		this.xinghao = xinghao;
+	}
+
+	public String getGuige() {
+		return guige;
+	}
+
+	public void setGuige(String guige) {
+		this.guige = guige;
+	}
+
+	public Double getShuliang() {
+		return shuliang;
+	}
+
+	public void setShuliang(Double shuliang) {
+		this.shuliang = shuliang;
+	}
+
+	public String getDanwei() {
+		return danwei;
+	}
+
+	public void setDanwei(String danwei) {
+		this.danwei = danwei;
+	}
+
+	public String getShengchangchangjia() {
+		return shengchangchangjia;
+	}
+
+	public void setShengchangchangjia(String shengchangchangjia) {
+		this.shengchangchangjia = shengchangchangjia;
+	}
+
+	public Double getDanjia() {
+		return danjia;
+	}
+
+	public void setDanjia(Double danjia) {
+		this.danjia = danjia;
+	}
+
+	public String getXinjiuchengdu() {
+		return xinjiuchengdu;
+	}
+
+	public void setXinjiuchengdu(String xinjiuchengdu) {
+		this.xinjiuchengdu = xinjiuchengdu;
+	}
+
+	public String getGouzhiriqi() {
+		return gouzhiriqi;
+	}
+
+	public void setGouzhiriqi(String gouzhiriqi) {
+		this.gouzhiriqi = gouzhiriqi;
+	}
+
+	public Double getJiandingdanjia() {
+		return jiandingdanjia;
+	}
+
+	public void setJiandingdanjia(Double jiandingdanjia) {
+		this.jiandingdanjia = jiandingdanjia;
+	}
+
+	public String getJiandingdanwei() {
+		return jiandingdanwei;
+	}
+
+	public void setJiandingdanwei(String jiandingdanwei) {
+		this.jiandingdanwei = jiandingdanwei;
+	}
+
+	public Double getJiandingfeiheji() {
+		return jiandingfeiheji;
+	}
+
+	public void setJiandingfeiheji(Double jiandingfeiheji) {
+		this.jiandingfeiheji = jiandingfeiheji;
+	}
+
+	public String getShangcijiandingsj() {
+		return shangcijiandingsj;
+	}
+
+	public void setShangcijiandingsj(String shangcijiandingsj) {
+		this.shangcijiandingsj = shangcijiandingsj;
+	}
+
+	public String getJiandingzhouqi() {
+		return jiandingzhouqi;
+	}
+
+	public void setJiandingzhouqi(String jiandingzhouqi) {
+		this.jiandingzhouqi = jiandingzhouqi;
+	}
+
+	public String getTigongyiqidanwei() {
+		return tigongyiqidanwei;
+	}
+
+	public void setTigongyiqidanwei(String tigongyiqidanwei) {
+		this.tigongyiqidanwei = tigongyiqidanwei;
+	}
+
+	public Integer getYiweixiucishu() {
+		return yiweixiucishu;
+	}
+
+	public void setYiweixiucishu(Integer yiweixiucishu) {
+		this.yiweixiucishu = yiweixiucishu;
+	}
+
+	public String getShifoubaoxiuqi() {
+		return shifoubaoxiuqi;
+	}
+
+	public void setShifoubaoxiuqi(String shifoubaoxiuqi) {
+		this.shifoubaoxiuqi = shifoubaoxiuqi;
+	}
+
+	public String getWeixiudanwei() {
+		return weixiudanwei;
+	}
+
+	public void setWeixiudanwei(String weixiudanwei) {
+		this.weixiudanwei = weixiudanwei;
+	}
+
+	public Double getWeixiufeiyong() {
+		return weixiufeiyong;
+	}
+
+	public void setWeixiufeiyong(Double weixiufeiyong) {
+		this.weixiufeiyong = weixiufeiyong;
+	}
+
+	public String getImporttime() {
+		return importtime;
+	}
+
+	public void setImporttime(String importtime) {
+		this.importtime = importtime;
+	}
+
+	public String getWeixiuneirong() {
+		return weixiuneirong;
+	}
+
+	public void setWeixiuneirong(String weixiuneirong) {
+		this.weixiuneirong = weixiuneirong;
+	}
+
+	@Override
+	public String toString() {
+		return "TableTotal [id=" + id + ", projectId=" + projectId + ", name=" + name + ", xinghao=" + xinghao
+				+ ", guige=" + guige + ", shuliang=" + shuliang + ", danwei=" + danwei + ", shengchangchangjia="
+				+ shengchangchangjia + ", danjia=" + danjia + ", xinjiuchengdu=" + xinjiuchengdu + ", gouzhiriqi="
+				+ gouzhiriqi + ", jiandingdanjia=" + jiandingdanjia + ", jiandingdanwei=" + jiandingdanwei
+				+ ", jiandingfeiheji=" + jiandingfeiheji + ", shangcijiandingsj=" + shangcijiandingsj
+				+ ", jiandingzhouqi=" + jiandingzhouqi + ", tigongyiqidanwei=" + tigongyiqidanwei + ", yiweixiucishu="
+				+ yiweixiucishu + ", shifoubaoxiuqi=" + shifoubaoxiuqi + ", weixiudanwei=" + weixiudanwei
+				+ ", weixiufeiyong=" + weixiufeiyong + ", importtime=" + importtime + ", weixiuneirong=" + weixiuneirong
+				+ "]";
+	}
+	
+	
+}

@@ -1,0 +1,83 @@
+package common.vo;
+
+public class Project {
+    private String projectId;
+
+    private String projectName;
+
+    private String projectDetail;
+
+    private String userId;
+
+    private String projectStatue;
+
+    private String projectType;
+
+    private String projectStep;
+
+    private String companyId;
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectDetail() {
+        return projectDetail;
+    }
+
+    public void setProjectDetail(String projectDetail) {
+        this.projectDetail = projectDetail;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getProjectStatue() {
+        return projectStatue;
+    }
+
+    public void setProjectStatue(String projectStatue) {
+        this.projectStatue = projectStatue;
+    }
+
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
+    }
+
+    public String getProjectStep() {
+        return projectStep;
+    }
+
+    public void setProjectStep(String projectStep) {
+        this.projectStep = projectStep;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
+    }
+}

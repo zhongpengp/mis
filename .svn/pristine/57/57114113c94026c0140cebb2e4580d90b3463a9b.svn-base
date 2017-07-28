@@ -1,0 +1,396 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>项目消息列表</title>
+<script type="text/javascript">
+	$(function(){
+		$("#begintimequery").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$("#endtimequery").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$('#begintimequery').datetimepicker().on('changeDate', function(ev){
+  			$('#endtimequery').datetimepicker('setStartDate',$("#begintimequery").val());
+  		});
+  		$('#endtimequery').datetimepicker().on('changeDate', function(ev){
+  			$('#begintimequery').datetimepicker('setEndDate',$("#endtimequery").val());
+  		});
+  		$("#begintime").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$("#endtime").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+  		$('#begintime').datetimepicker().on('changeDate', function(ev){
+  			$('#endtime').datetimepicker('setStartDate',$("#begintime").val());
+  		});
+  		$('#endtime').datetimepicker().on('changeDate', function(ev){
+  			$('#begintime').datetimepicker('setEndDate',$("#endtime").val());
+  		});
+  		initprojectMsgListRecevie('recevie');
+  		$('#myTab a:first').tab('show');
+  		$('#myTab a:first').click(function (e) {
+  			initprojectMsgListRecevie('recevie');
+  		})
+  		$('#myTab li:eq(1) a').click(function (e) {
+  			initprojectMsgList('send');
+  		})
+  		$('#recevieModal').on('hidden.bs.modal', function (e) {
+            $('#tableDRec').bootstrapTable('refresh');
+        });
+	});
+	var userType = '<%=request.getSession().getAttribute("userType")%>';
+	
+	//页面初始化加载消息列表
+	function initprojectMsgList(param){
+		$("#tableD").bootstrapTable('destroy');
+		$("#tableD").bootstrapTable({
+			url:'<%=path%>/message/getMessageListByUserId.do',
+			method: 'get',
+            //toolbar: '#toolbar',    //工具按钮用哪个容器
+            striped: true,      //是否显示行间隔色
+            cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,     //是否显示分页（*）
+            sortable: false,      //是否启用排序
+            sortOrder: "asc",     //排序方式
+            //pageNumber:1,      //初始化加载第一页，默认第一页
+            pageSize: 10,      //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],  //可供选择的每页的行数（*）
+            queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                                // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+            //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+            sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+            //search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            strictSearch: true,
+            //showColumns: true,     //是否显示所有的列
+            //showRefresh: true,     //是否显示刷新按钮
+            minimumCountColumns: 2,    //最少允许的列数
+            clickToSelect: true,    //是否启用点击选中行
+		 	queryParams : function(data) {
+		 		data.queryType = param;
+	 			data.startTime = $("#begintimequery").val();
+		 		data.endTime = $("#endtimequery").val();
+		 		data.msgtheme = $("#messageTheme").val();
+				return data;
+			},
+			onLoadSuccess : function(data){
+				if(param=='send'){
+					$("#tableD").bootstrapTable('hideColumn','sendProjectName');
+					if(userType=='2'){
+						$("#tableD").bootstrapTable('hideColumn','recevieProjectName');
+					}else{
+						$("#tableD").bootstrapTable('showColumn','recevieProjectName');
+					}
+				}else{
+					$("#tableD").bootstrapTable('hideColumn','recevieProjectName');
+					if(userType=='2'){
+						$("#tableD").bootstrapTable('hideColumn','sendProjectName');
+					}
+				}
+			},
+			columns : [
+						{field : 'sendProjectName', title : '发件人项目', align: 'left'},
+						{field : 'recevieProjectName', title : '收件人项目', align: 'left'},
+						{field : 'messageTheme', title : '消息主题', align: 'left'},
+					  	{field : 'sendTime', title : '发件时间', align: 'center'},
+					  	//{field : 'messageSend', title : '消息内容', align: 'left'},
+					  	{field : 'isRecevierRead', title : '是否回复', align: 'center',
+					  		formatter: function(value,row,index){
+					  			if(value=='1'){
+					  				return "否";
+					  			}else if(value=='2'){
+					  				return "是";
+					  			}
+					  		}
+					  	},
+					  	{field : 'attachmentSend', title : '附件下载', align: 'center',
+					  		formatter: function(value,row,index){
+					  			var retVal="";
+					  			if(row.attachmentSend!=null&&row.attachmentSend!=""){
+					  				retVal += '<a href="../../..'+row.attachmentSend+'">发送附件下载</a>&nbsp;&nbsp;';
+					  			}
+					  			if(row.attachmentReply!=null&&row.attachmentReply!=""){
+					  				retVal += '<a href="../../..'+row.attachmentReply+'">回复附件下载</a>';
+					  			}
+					  			return retVal;
+					  		}
+					  	},
+				  		{field : 'messageTheme', title : '操作', align: 'center',
+					  		formatter: function(value,row,index){
+					  			var str = "<a href='javascript:void(0)' onclick=chakanMessageDetail('"+index+"','send'); >详细</a>&nbsp;&nbsp;";
+					  			return str;
+					  		}
+					  	}
+					   ]
+		});
+	}
+	
+	function initprojectMsgListRecevie(param){
+		$("#tableDRec").bootstrapTable('destroy');
+		$("#tableDRec").bootstrapTable({
+			url:'<%=path%>/message/getMessageListByUserId.do',
+			method: 'get',
+            //toolbar: '#toolbar',    //工具按钮用哪个容器
+            striped: true,      //是否显示行间隔色
+            cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,     //是否显示分页（*）
+            sortable: false,      //是否启用排序
+            sortOrder: "asc",     //排序方式
+            //pageNumber:1,      //初始化加载第一页，默认第一页
+            pageSize: 10,      //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],  //可供选择的每页的行数（*）
+            queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                                // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+            //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+            sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+            //search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            strictSearch: true,
+            //showColumns: true,     //是否显示所有的列
+            //showRefresh: true,     //是否显示刷新按钮
+            minimumCountColumns: 2,    //最少允许的列数
+            clickToSelect: true,    //是否启用点击选中行
+		 	queryParams : function(data) {
+		 		data.queryType = param;
+	 			data.startTime = $("#begintime").val();
+		 		data.endTime = $("#endtime").val();
+		 		data.msgtheme = $("#messageThemeRec").val();
+				return data;
+			},
+			onLoadSuccess : function(data){
+				if(param=='send'){
+					$("#tableDRec").bootstrapTable('hideColumn','sendProjectName');
+					$("#tableDRec").bootstrapTable('showColumn','recevieProjectName');
+				}else{
+					$("#tableDRec").bootstrapTable('hideColumn','recevieProjectName');
+					if(userType=='2'){
+						$("#tableDSend").bootstrapTable('hideColumn','sendProjectName');
+					}
+				}
+			},
+			columns : [
+						{field : 'sendProjectName', title : '发件人项目', align: 'left'},
+						{field : 'recevieProjectName', title : '收件人项目', align: 'left'},
+						{field : 'messageTheme', title : '消息主题', align: 'left'},
+					  	{field : 'sendTime', title : '发件时间', align: 'center'},
+					  	//{field : 'messageSend', title : '消息内容', align: 'left'},
+					  	{field : 'isRecevierRead', title : '是否回复', align: 'center',
+					  		formatter: function(value,row,index){
+					  			if(value=='1'){
+					  				return "否";
+					  			}else if(value=='2'){
+					  				return "是";
+					  			}
+					  		}
+					  	},
+					  	{field : 'attachmentSend', title : '附件下载', align: 'center',
+					  		formatter: function(value,row,index){
+				  				var retVal="";
+					  			if(row.attachmentSend!=null&&row.attachmentSend!=""){
+					  				retVal += '<a href="../../..'+row.attachmentSend+'">发送附件下载</a>&nbsp;&nbsp;';
+					  			}
+					  			if(row.attachmentReply!=null&&row.attachmentReply!=""){
+					  				retVal += '<a href="../../..'+row.attachmentReply+'">回复附件下载</a>';
+					  			}
+					  			return retVal;
+				  		}},
+				  		{field : 'messageTheme', title : '操作', align: 'center',
+					  		formatter: function(value,row,index){
+					  			var str = "<a href='javascript:void(0)' onclick=chakanMessageDetail('"+index+"','rec');>详细</a>&nbsp;&nbsp;";
+					  			if(row.isRecevierRead=='1'){
+					  				str +="<a href='javascript:void(0)' onclick=RecevieMessage('"+row.messageId+"')>回复</a>";
+					  			}
+					  			return str;
+					  		}
+					  	}
+					   ]
+		});
+	}
+	
+	//查看消息详情
+	function chakanMessageDetail(index,type){
+		var $table;
+		if(type=='send'){
+			$table =  $("#tableD");
+		}else{
+			$table = $("#tableDRec");
+		}
+		var data = $table.bootstrapTable("getOptions").data;
+		setData(data[index]);
+		$('#updateModal').modal('toggle');
+	}
+	
+	//回复消息
+	function RecevieMessage(msgId){
+		initRecData(msgId);
+		$('#recevieModal').modal('toggle');
+	}
+	
+	//查询按钮
+	function getQueryMessage(param){
+		if(param=='send'){
+			initprojectMsgList(param);
+		}else{
+			initprojectMsgListRecevie(param);
+		}
+	}
+	
+	//保存回复消息
+	function recevieMessage(){
+		saveRecMessage();
+	}
+</script>
+</head>
+<body>
+<div class="container" style="margin:10px;width: 98%;">
+<div class="content">
+		<div class="page-content-wrapper">
+			<div class="page-content">
+			<!-- <div class="col-md-12 text-left page-offset" style="margin-top: 10px;margin-bottom: 10px;">
+				<button id="add" type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增消息</button>
+				<button id="update" type="button" class="btn btn-warning"data-toggle="modal">修改</button>
+				<button id="delete" type="button" class="btn btn-danger" >删除</button>
+			</div> -->
+				<ul id="myTab" class="nav nav-tabs">
+				   <li class="active">
+				      <a href="#senMsg" data-toggle="tab">收件箱</a>
+				   </li>
+				   <li><a href="#recevieMsg" data-toggle="tab">发件箱</a></li>
+				</ul>
+				<div id="myTabContent" class="tab-content">
+				   <div class="tab-pane fade in active" id="senMsg">
+				      <div id="main" class="drmtable">
+						<div class="tjsx_title">条件筛选：</div>
+							<div id="filterRec">
+								  <div class="filtrate_box clearfix"  style="margin-bottom: 3px" >
+								    <ul class="filtrate_list" >
+									    <li class="child_li first_sort" >
+									        <div class="list_left">消息主题：</div>
+									        <div class="list_right">
+									          <div class="list_content fix_list">
+									            <div class="clearfix">
+									            	<div class="col-md-5">
+										            	<input id="messageThemeRec" class="form-control" name="messageTheme" type="text" />
+									            	</div>
+									            </div>
+									          </div>
+										  	</div>
+									      </li> 
+								       <li class="child_li first_sort bac_bl" >
+									        <div class="list_left">日期：</div>
+									        <div class="list_right">
+									          <div class="list_content fix_list">
+									            <div class="clearfix">
+										            <div class="col-md-3">
+														<input placeholder="开始时间" type="text" id="begintime" size="10" class="form-control form_datetime" name="begintimequery" readonly>
+													</div>
+										            <div class="col-md-3">
+														<input placeholder="结束时间" type="text" id="endtime" size="10" class="form-control form_datetime" name="endtimequery" readonly>
+													</div>
+													<button id="querySend" type="button" onclick="getQueryMessage('recevie')" class="btn btn-info">查询 </button>
+									            </div>
+									          </div>
+										  	</div>
+									      </li> 
+								    </ul>
+									</div>
+									<div id="bodyFrameRec">
+										<table id="tableDRec" data-click-to-select="true" class="table table-condensed">
+											<thead style="background:#ace4ff;">
+												<tr></tr>
+											</thead>
+										</table>
+									</div>
+									<!-- table -->
+							</div>
+					   </div>
+				   </div>
+				   <div class="tab-pane fade" id="recevieMsg">
+				      <div id="main" class="drmtable">
+						<div class="tjsx_title">条件筛选：</div>
+						<div id="filter">
+							  <div class="filtrate_box clearfix"  style="margin-bottom: 3px" >
+							    <ul class="filtrate_list" >
+							    	<li class="child_li first_sort" >
+								        <div class="list_left">消息主题：</div>
+								        <div class="list_right">
+								          <div class="list_content fix_list">
+								            <div class="clearfix">
+								            	<div class="col-md-5">
+									            	<input id="messageTheme" class="form-control" name="messageTheme" type="text" />
+								            	</div>
+								            </div>
+								          </div>
+									  	</div>
+								      </li>
+							       <li class="child_li first_sort bac_bl" >
+								        <div class="list_left">日期：</div>
+								        <div class="list_right">
+								          <div class="list_content fix_list">
+								            <div class="clearfix">
+									            <div class="col-md-3">
+													<input placeholder="开始时间" type="text" id="begintimequery" size="10" class="form-control form_datetime" name="begintimequery" readonly>
+												</div>
+									            <div class="col-md-3">
+													<input placeholder="结束时间" type="text" id="endtimequery" size="10" class="form-control form_datetime" name="endtimequery" readonly>
+												</div>
+												<button id="query" type="button" onclick="getQueryMessage('send')" class="btn btn-info">查询 </button>
+								            </div>
+								          </div>
+									  	</div>
+								      </li> 
+							    </ul>
+								</div>
+								<div id="bodyFrame">
+									<table id="tableD" data-click-to-select="true" class="table table-condensed">
+										<thead style="background:#ace4ff;">
+											<tr></tr>
+										</thead>
+									</table>
+								</div>
+								<!-- table -->
+						</div>
+				   </div>
+				</div>
+				<!-- 消息详情 -->
+				<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="width: 880px">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+								</button>
+								<h4 class="modal-title" id="updateModalLabel">【消息详情】</h4>
+							</div>
+							<div id="updateTable" class="modal-body">
+								<jsp:include page="/views/projectMsg/messageDetail.jsp" />
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 回复消息 -->
+				<div class="modal fade" id="recevieModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="width: 880px">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+								</button>
+								<h4 class="modal-title" id="updateModalLabel">【回复消息】</h4>
+							</div>
+							<div id="recevieTable" class="modal-body">
+								<jsp:include page="/views/projectMsg/recevieMessage.jsp" />
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary" onclick="recevieMessage()">保存</button>
+							</div>
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+</body>
+</html>

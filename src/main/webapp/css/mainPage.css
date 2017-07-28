@@ -1,0 +1,81 @@
+@CHARSET "UTF-8";
+
+#main-nav {
+	margin-left: 1px;
+}
+
+#main-nav.nav-tabs.nav-stacked>li>a {
+	padding: 10px 8px;
+	font-size: small;
+	font-weight: 600;
+	color: #fff;
+	background: #68bcee;
+	background: -moz-linear-gradient(top, #4F94CD 0%, #68bcee 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #68bcee),
+		color-stop(100%, #68bcee));
+	background: -webkit-linear-gradient(top, #4F94CD 0%, #68bcee 100%);
+	background: -o-linear-gradient(top, #4F94CD 0%, #68bcee 100%);
+	background: -ms-linear-gradient(top, #4F94CD 0%, #68bcee 100%);
+	background: linear-gradient(top, #4F94CD 0%, #68bcee 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#68bcee',
+		endColorstr='#68bcee');
+	-ms-filter:
+		"progid:DXImageTransform.Microsoft.gradient(startColorstr='#4F94CD', endColorstr='#68bcee')";
+	border: 1px solid #fff;
+	border-radius: 4px;
+}
+
+#main-nav.nav-tabs.nav-stacked>li>a>span {
+	color: #fff;
+}
+
+#main-nav.nav-tabs.nav-stacked>li.active>a, #main-nav.nav-tabs.nav-stacked>li>a:hover
+	{
+	color: #fff;
+	font-size:medium;
+	background: #68bcee;
+	background: -moz-linear-gradient(top, #63B8FF 0%, #68bcee 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #63B8FF),
+		color-stop(100%, #68bcee));
+	background: -webkit-linear-gradient(top, #63B8FF 0%, #68bcee 100%);
+	background: -o-linear-gradient(top, #63B8FF 0%, #68bcee 100%);
+	background: -ms-linear-gradient(top, #63B8FF 0%, #68bcee 100%);
+	background: linear-gradient(top, #63B8FF 0%, #68bcee 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#63B8FF',
+		endColorstr='#68bcee');
+	-ms-filter:
+		"progid:DXImageTransform.Microsoft.gradient(startColorstr='#63B8FF', endColorstr='#68bcee')";
+	border-color: #B0E2FF;
+}
+
+#main-nav.nav-tabs.nav-stacked>li.active>a, #main-nav.nav-tabs.nav-stacked>li>a:hover>span
+	{
+	color: #FFF;
+}
+
+#main-nav.nav-tabs.nav-stacked>li {
+	margin-bottom: 4px;
+}
+
+/*定义二级菜单样式*/
+.secondmenu a {
+	font-size: small;
+	color: #4A515B;
+	text-align: center;
+	font-weight: bolder;
+}
+
+.navbar-static-top {
+	background-color: #4F94CD;
+	margin-bottom: 5px;
+}
+
+.navbar-brand {
+	background: url('') no-repeat 10px 8px;
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 50px;
+	color: #fff;
+	font-weight: bolder;
+	font-size: x-large;
+}

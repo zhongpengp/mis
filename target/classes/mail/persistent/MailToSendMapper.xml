@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mail.persistent.MailToSendMapper" >
+  <resultMap id="BaseResultMap" type="mail.vo.MailToSend" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="mail_title" property="mailTitle" jdbcType="VARCHAR" />
+    <result column="mail_context" property="mailContext" jdbcType="VARCHAR" />
+    <result column="time_add" property="timeAdd" jdbcType="TIMESTAMP" />
+    <result column="time_send" property="timeSend" jdbcType="TIMESTAMP" />
+    <result column="mail_state" property="mailState" jdbcType="INTEGER" />
+    <result column="receive_userAddress" property="receiveUseraddress" jdbcType="VARCHAR" />
+    <result column="send_userAddress" property="sendUseraddress" jdbcType="VARCHAR" />
+    <result column="send_userID" property="sendUserid" jdbcType="VARCHAR" />
+    <result column="receive_userID" property="receiveUserid" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, mail_title, mail_context, time_add, time_send, mail_state, receive_userAddress, 
+    send_userAddress, send_userID, receive_userID
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="mail.vo.MailToSendExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from MAIL_TOSEND
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from MAIL_TOSEND
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from MAIL_TOSEND
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="mail.vo.MailToSendExample" >
+    delete from MAIL_TOSEND
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="mail.vo.MailToSend" >
+    insert into MAIL_TOSEND (id, mail_title, mail_context, 
+      time_add, time_send, mail_state, 
+      receive_userAddress, send_userAddress, send_userID, 
+      receive_userID)
+    values (#{id,jdbcType=INTEGER}, #{mailTitle,jdbcType=VARCHAR}, #{mailContext,jdbcType=VARCHAR}, 
+      #{timeAdd,jdbcType=TIMESTAMP}, #{timeSend,jdbcType=TIMESTAMP}, #{mailState,jdbcType=INTEGER}, 
+      #{receiveUseraddress,jdbcType=VARCHAR}, #{sendUseraddress,jdbcType=VARCHAR}, #{sendUserid,jdbcType=VARCHAR}, 
+      #{receiveUserid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="mail.vo.MailToSend" >
+    insert into MAIL_TOSEND
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="mailTitle != null" >
+        mail_title,
+      </if>
+      <if test="mailContext != null" >
+        mail_context,
+      </if>
+      <if test="timeAdd != null" >
+        time_add,
+      </if>
+      <if test="timeSend != null" >
+        time_send,
+      </if>
+      <if test="mailState != null" >
+        mail_state,
+      </if>
+      <if test="receiveUseraddress != null" >
+        receive_userAddress,
+      </if>
+      <if test="sendUseraddress != null" >
+        send_userAddress,
+      </if>
+      <if test="sendUserid != null" >
+        send_userID,
+      </if>
+      <if test="receiveUserid != null" >
+        receive_userID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="mailTitle != null" >
+        #{mailTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="mailContext != null" >
+        #{mailContext,jdbcType=VARCHAR},
+      </if>
+      <if test="timeAdd != null" >
+        #{timeAdd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="timeSend != null" >
+        #{timeSend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mailState != null" >
+        #{mailState,jdbcType=INTEGER},
+      </if>
+      <if test="receiveUseraddress != null" >
+        #{receiveUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="sendUseraddress != null" >
+        #{sendUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="sendUserid != null" >
+        #{sendUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveUserid != null" >
+        #{receiveUserid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="mail.vo.MailToSendExample" resultType="java.lang.Integer" >
+    select count(*) from MAIL_TOSEND
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update MAIL_TOSEND
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.mailTitle != null" >
+        mail_title = #{record.mailTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailContext != null" >
+        mail_context = #{record.mailContext,jdbcType=VARCHAR},
+      </if>
+      <if test="record.timeAdd != null" >
+        time_add = #{record.timeAdd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.timeSend != null" >
+        time_send = #{record.timeSend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.mailState != null" >
+        mail_state = #{record.mailState,jdbcType=INTEGER},
+      </if>
+      <if test="record.receiveUseraddress != null" >
+        receive_userAddress = #{record.receiveUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sendUseraddress != null" >
+        send_userAddress = #{record.sendUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sendUserid != null" >
+        send_userID = #{record.sendUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.receiveUserid != null" >
+        receive_userID = #{record.receiveUserid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update MAIL_TOSEND
+    set id = #{record.id,jdbcType=INTEGER},
+      mail_title = #{record.mailTitle,jdbcType=VARCHAR},
+      mail_context = #{record.mailContext,jdbcType=VARCHAR},
+      time_add = #{record.timeAdd,jdbcType=TIMESTAMP},
+      time_send = #{record.timeSend,jdbcType=TIMESTAMP},
+      mail_state = #{record.mailState,jdbcType=INTEGER},
+      receive_userAddress = #{record.receiveUseraddress,jdbcType=VARCHAR},
+      send_userAddress = #{record.sendUseraddress,jdbcType=VARCHAR},
+      send_userID = #{record.sendUserid,jdbcType=VARCHAR},
+      receive_userID = #{record.receiveUserid,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="mail.vo.MailToSend" >
+    update MAIL_TOSEND
+    <set >
+      <if test="mailTitle != null" >
+        mail_title = #{mailTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="mailContext != null" >
+        mail_context = #{mailContext,jdbcType=VARCHAR},
+      </if>
+      <if test="timeAdd != null" >
+        time_add = #{timeAdd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="timeSend != null" >
+        time_send = #{timeSend,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mailState != null" >
+        mail_state = #{mailState,jdbcType=INTEGER},
+      </if>
+      <if test="receiveUseraddress != null" >
+        receive_userAddress = #{receiveUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="sendUseraddress != null" >
+        send_userAddress = #{sendUseraddress,jdbcType=VARCHAR},
+      </if>
+      <if test="sendUserid != null" >
+        send_userID = #{sendUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveUserid != null" >
+        receive_userID = #{receiveUserid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="mail.vo.MailToSend" >
+    update MAIL_TOSEND
+    set mail_title = #{mailTitle,jdbcType=VARCHAR},
+      mail_context = #{mailContext,jdbcType=VARCHAR},
+      time_add = #{timeAdd,jdbcType=TIMESTAMP},
+      time_send = #{timeSend,jdbcType=TIMESTAMP},
+      mail_state = #{mailState,jdbcType=INTEGER},
+      receive_userAddress = #{receiveUseraddress,jdbcType=VARCHAR},
+      send_userAddress = #{sendUseraddress,jdbcType=VARCHAR},
+      send_userID = #{sendUserid,jdbcType=VARCHAR},
+      receive_userID = #{receiveUserid,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

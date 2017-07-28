@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="project.persistent.ProjectVOMapper" >
+  <resultMap id="BaseResultMap" type="project.vo.ProjectVO" >
+    <id column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="PROJECT_DETAIL" property="projectDetail" jdbcType="VARCHAR" />
+    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATUE" property="projectStatue" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="projectReturnVOMap" type="project.vo.ProjectReturnVO" >
+    <result column="PROJECT_ID" property="projectID" jdbcType="VARCHAR" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="PROJECT_DETAIL" property="projectDetail" jdbcType="VARCHAR" />
+    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATUE" property="projectStatue" jdbcType="VARCHAR" />
+    <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+    <result column="PHONE_NUM" property="phoneNum" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    PROJECT_ID, PROJECT_NAME, PROJECT_DETAIL, USER_ID, PROJECT_STATUE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="project.vo.ProjectVOExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="project.vo.ProjectVOExample" >
+    delete from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="project.vo.ProjectVO" >
+    insert into PROJECT (PROJECT_ID, PROJECT_NAME, PROJECT_DETAIL, 
+      USER_ID, PROJECT_STATUE)
+    values (#{projectId,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{projectDetail,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=VARCHAR}, #{projectStatue,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="project.vo.ProjectVO" >
+    insert into PROJECT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        PROJECT_ID,
+      </if>
+      <if test="projectName != null" >
+        PROJECT_NAME,
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL,
+      </if>
+      <if test="userId != null" >
+        USER_ID,
+      </if>
+      <if test="projectStatue != null" >
+        PROJECT_STATUE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStatue != null" >
+        #{projectStatue,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="project.vo.ProjectVOExample" resultType="java.lang.Integer" >
+    select count(*) from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update PROJECT
+    <set >
+      <if test="record.projectId != null" >
+        PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectDetail != null" >
+        PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        USER_ID = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectStatue != null" >
+        PROJECT_STATUE = #{record.projectStatue,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update PROJECT
+    set PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      USER_ID = #{record.userId,jdbcType=VARCHAR},
+      PROJECT_STATUE = #{record.projectStatue,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="project.vo.ProjectVO" >
+    update PROJECT
+    <set >
+      <if test="projectName != null" >
+        PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        USER_ID = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStatue != null" >
+        PROJECT_STATUE = #{projectStatue,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="project.vo.ProjectVO" >
+    update PROJECT
+    set PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      USER_ID = #{userId,jdbcType=VARCHAR},
+      PROJECT_STATUE = #{projectStatue,jdbcType=VARCHAR}
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="getProjectList" parameterType="java.util.Map" resultMap="projectReturnVOMap">
+	select *
+	from PROJECT t1
+	left join USER t2
+	on t1.PROJECT_ID=t2.USER_ID
+	where 1=1
+	<if test="projectName!=null and projectName!=''">
+		and t1.PROJECT_NAME=#{projectName}
+	</if>
+	<if test="projectStatue!=null and projectStatue!=''">
+		and t1.PROJECT_STATUE=#{projectStatue}
+	</if>
+  </select>
+
+	<update id="logoutProject" parameterType="java.lang.String">
+		update PROJECT set PROJECT_STATUE='4' WHERE PROJECT_ID=#{param1}
+	</update>
+</mapper>

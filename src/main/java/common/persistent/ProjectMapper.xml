@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.ProjectMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.Project" >
+    <id column="PROJECT_ID" property="projectId" jdbcType="VARCHAR" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="PROJECT_DETAIL" property="projectDetail" jdbcType="VARCHAR" />
+    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATUE" property="projectStatue" jdbcType="VARCHAR" />
+    <result column="PROJECT_TYPE" property="projectType" jdbcType="VARCHAR" />
+    <result column="PROJECT_STEP" property="projectStep" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    PROJECT_ID, PROJECT_NAME, PROJECT_DETAIL, USER_ID, PROJECT_STATUE, PROJECT_TYPE, 
+    PROJECT_STEP, COMPANY_ID
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.ProjectExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from PROJECT
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.ProjectExample" >
+    delete from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.Project" >
+    insert into PROJECT (PROJECT_ID, PROJECT_NAME, PROJECT_DETAIL, 
+      USER_ID, PROJECT_STATUE, PROJECT_TYPE, 
+      PROJECT_STEP, COMPANY_ID)
+    values (#{projectId,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{projectDetail,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=VARCHAR}, #{projectStatue,jdbcType=VARCHAR}, #{projectType,jdbcType=VARCHAR}, 
+      #{projectStep,jdbcType=VARCHAR}, #{companyId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.Project" >
+    insert into PROJECT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        PROJECT_ID,
+      </if>
+      <if test="projectName != null" >
+        PROJECT_NAME,
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL,
+      </if>
+      <if test="userId != null" >
+        USER_ID,
+      </if>
+      <if test="projectStatue != null" >
+        PROJECT_STATUE,
+      </if>
+      <if test="projectType != null" >
+        PROJECT_TYPE,
+      </if>
+      <if test="projectStep != null" >
+        PROJECT_STEP,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStatue != null" >
+        #{projectStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStep != null" >
+        #{projectStep,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.ProjectExample" resultType="java.lang.Integer" >
+    select count(*) from PROJECT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update PROJECT
+    <set >
+      <if test="record.projectId != null" >
+        PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectDetail != null" >
+        PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        USER_ID = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectStatue != null" >
+        PROJECT_STATUE = #{record.projectStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectType != null" >
+        PROJECT_TYPE = #{record.projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectStep != null" >
+        PROJECT_STEP = #{record.projectStep,jdbcType=VARCHAR},
+      </if>
+      <if test="record.companyId != null" >
+        COMPANY_ID = #{record.companyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update PROJECT
+    set PROJECT_ID = #{record.projectId,jdbcType=VARCHAR},
+      PROJECT_NAME = #{record.projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{record.projectDetail,jdbcType=VARCHAR},
+      USER_ID = #{record.userId,jdbcType=VARCHAR},
+      PROJECT_STATUE = #{record.projectStatue,jdbcType=VARCHAR},
+      PROJECT_TYPE = #{record.projectType,jdbcType=VARCHAR},
+      PROJECT_STEP = #{record.projectStep,jdbcType=VARCHAR},
+      COMPANY_ID = #{record.companyId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.Project" >
+    update PROJECT
+    <set >
+      <if test="projectName != null" >
+        PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDetail != null" >
+        PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        USER_ID = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStatue != null" >
+        PROJECT_STATUE = #{projectStatue,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        PROJECT_TYPE = #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="projectStep != null" >
+        PROJECT_STEP = #{projectStep,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID = #{companyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.Project" >
+    update PROJECT
+    set PROJECT_NAME = #{projectName,jdbcType=VARCHAR},
+      PROJECT_DETAIL = #{projectDetail,jdbcType=VARCHAR},
+      USER_ID = #{userId,jdbcType=VARCHAR},
+      PROJECT_STATUE = #{projectStatue,jdbcType=VARCHAR},
+      PROJECT_TYPE = #{projectType,jdbcType=VARCHAR},
+      PROJECT_STEP = #{projectStep,jdbcType=VARCHAR},
+      COMPANY_ID = #{companyId,jdbcType=VARCHAR}
+    where PROJECT_ID = #{projectId,jdbcType=VARCHAR}
+  </update>
+  
+  <resultMap type="common.vo.UnCheckMachineVO" id="UnCheckMachineVO">
+		<result column="ID" property="id" jdbcType="VARCHAR"/>
+		<result column="MACHINE_ID" property="machineId" jdbcType="VARCHAR"/>
+		<result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR"/>
+		<result column="MACHINE_NAME" property="machineName" jdbcType="VARCHAR"/>
+		<result column="PRODUCER" property="producer" jdbcType="VARCHAR"/>
+		<result column="GYX_NAME" property="gyxName" jdbcType="VARCHAR"/>
+		<result column="CHECK_DATE" property="checkDate" jdbcType="VARCHAR"/>
+		<result column="CHECK_PERIOD" property="checkPeriod" jdbcType="VARCHAR"/>
+		<result column="CHECK_UNIT" property="checkUnit" jdbcType="VARCHAR"/>
+		<result column="CHECK_COST" property="checkCost" jdbcType="VARCHAR"/>
+		<result column="CHECK_PROVE" property="checkProve" jdbcType="VARCHAR"/>
+		<result column="CHECK_PAY" property="checkPay" jdbcType="VARCHAR"/>
+		<result column="CHECK_STATE" property="checkState" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <select id="getUncheckList" parameterType="java.util.Map" resultMap="UnCheckMachineVO">
+  	SELECT
+		t.ID MACHINE_ID,
+	    t.PROJECT_ID,
+		t.CHECK_DATE,
+		t.CHECK_PERIOD,
+		t.MACHINE_NAME,
+		t.PRODUCER,
+		'0' CHECK_STATE,
+	  (SELECT SUPPLIER_NAME FROM SUPPLIER WHERE SUPPLIER_ID = t.GYX_ID) GYX_NAME 
+	FROM
+		PROJECT_INSTRUMENT_INFO t
+	WHERE t.PROJECT_ID=#{projectId}
+		and ADDDATE(SYSDATE(),30) &gt;= t.CHECK_DATE
+		and t.MACHINE_STATE='0' 
+  	  <if test="macName != null" >
+        and  t.MACHINE_NAME LIKE CONCAT('%',#{macName},'%')
+      </if>
+      <if test="startTime != null and startTime != ''">
+		and  DATE_FORMAT(t.CHECK_DATE,'%Y-%m-%d') &gt;= #{startTime}
+	  </if>
+	  <if test="endTime != null and endTime != ''">
+		and  DATE_FORMAT(t.CHECK_DATE,'%Y-%m-%d') &lt;= #{endTime} 
+	  </if>
+  </select>	
+  	
+  <select id="getCheckedList" parameterType="java.util.Map" resultMap="UnCheckMachineVO">
+  	 SELECT * FROM MACHINE_CHECK_INFO  WHERE PROJECT_ID = #{projectId} and CHECK_STATE = '1'
+  	  <if test="macName != null" >
+        and  MACHINE_NAME LIKE CONCAT('%',#{macName},'%')
+      </if>
+      <if test="startTime != null and startTime != ''">
+		and  CHECK_DATE &gt;= #{startTime}
+	  </if>
+	  <if test="endTime != null and endTime != ''">
+		and  CHECK_DATE &lt;= #{endTime} 
+	  </if>
+  </select>
+  
+  <insert id="inserCheckMachine" parameterType="common.vo.UnCheckMachineVO"> 
+  	 insert into MACHINE_CHECK_INFO 
+  	  (ID,PROJECT_ID,MACHINE_ID,GYX_NAME,MACHINE_NAME,PRODUCER,CHECK_PERIOD,
+  	  CHECK_DATE,CHECK_UNIT,CHECK_COST,CHECK_PROVE,CHECK_PAY,CHECK_STATE) 
+  	 	values
+  	  (#{id},#{projectId},#{machineId},#{gyxName},#{machineName},#{producer},#{checkPeriod},
+  	  #{checkDate},#{checkUnit},#{checkCost},#{checkProve},#{checkPay},#{checkState})
+  </insert>
+  
+  <update id="updateMachine" parameterType="common.vo.UnCheckMachineVO">
+  		UPDATE PROJECT_INSTRUMENT_INFO 
+  			SET CHECK_DATE = #{checkDate} WHERE ID = #{machineId}   
+  </update>
+  
+   <resultMap type="common.vo.RepairMachineVO" id="RepairMachineVO">
+		<result column="ID" property="id" jdbcType="VARCHAR"/>
+		<result column="MACHINE_ID" property="machineId" jdbcType="VARCHAR"/>
+		<result column="PROJECT_ID" property="projectId" jdbcType="VARCHAR"/>
+		<result column="MACHINE_NAME" property="machineName" jdbcType="VARCHAR"/>
+		<result column="PRODUCER" property="producer" jdbcType="VARCHAR"/>
+		<result column="GYX_NAME" property="gyxName" jdbcType="VARCHAR"/>
+		<result column="REPAIR_DATE" property="repairDate" jdbcType="VARCHAR"/>
+		<result column="REPAIR_UNIT" property="repairUnit" jdbcType="VARCHAR"/>
+		<result column="REPAIR_COST" property="repairCost" jdbcType="VARCHAR"/>
+		<result column="REPAIR_BODY" property="repairBody" jdbcType="VARCHAR"/>
+		<result column="ISSUE" property="issue" jdbcType="VARCHAR"/>
+		<result column="ZHIBAOQI" property="zhibaoqi" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <select id="getUnRepairList" parameterType="java.util.Map" resultMap="RepairMachineVO">
+  	SELECT
+		t.ID MACHINE_ID,
+	    t.PROJECT_ID,
+		t.BAOZHIQI ZHIBAOQI,
+		t.MACHINE_NAME,
+		t.PRODUCER,
+	  (SELECT SUPPLIER_NAME FROM SUPPLIER WHERE SUPPLIER_ID = t.GYX_ID) GYX_NAME 
+	FROM
+		PROJECT_INSTRUMENT_INFO t
+	WHERE t.PROJECT_ID=#{projectId}
+		and t.MACHINE_STATE='2' 
+  	  <if test="macName != null" >
+        and  t.MACHINE_NAME LIKE CONCAT('%',#{macName},'%')
+      </if>
+  </select>
+  
+  <select id="getRepairedList" parameterType="java.util.Map" resultMap="RepairMachineVO">
+  	 SELECT * FROM INSTRUMENT_REPAIR_INFO WHERE PROJECT_ID = #{projectId} 
+  	  <if test="macName != null" >
+        and  MACHINE_NAME LIKE CONCAT('%',#{macName},'%')
+      </if>
+      ORDER BY REPAIR_DATE DESC
+  </select>
+  
+  <insert id="inserRepairMachine" parameterType="common.vo.RepairMachineVO">
+  	   insert into INSTRUMENT_REPAIR_INFO 
+  	  (ID,PROJECT_ID,MACHINE_ID,GYX_NAME,MACHINE_NAME,PRODUCER,
+  	  REPAIR_DATE,REPAIR_UNIT,REPAIR_COST,REPAIR_BODY,ISSUE,ZHIBAOQI) 
+  	 	values
+  	  (#{id},#{projectId},#{machineId},#{gyxName},#{machineName},#{producer},#{repairDate},
+  	  #{repairUnit},#{repairCost},#{repairBody},#{issue},#{zhibaoqi})
+  </insert>
+  
+  <update id="updateMachineState" parameterType="java.lang.String">
+  		update PROJECT_INSTRUMENT_INFO SET MACHINE_STATE = '0',REPAIR_NUM = REPAIR_NUM+1 WHERE ID = #{id}
+  </update>
+  
+  <update id="machineDestroy" parameterType="java.lang.String">
+  	    update PROJECT_INSTRUMENT_INFO SET MACHINE_STATE = '3' WHERE ID in (${ids})
+  </update>
+</mapper>

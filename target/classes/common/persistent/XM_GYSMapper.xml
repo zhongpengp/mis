@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.XM_GYSMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.XM_GYS" >
+    <id column="XM_USER_ID" property="xmUserId" jdbcType="VARCHAR" />
+    <id column="GYS_USER_ID" property="gysUserId" jdbcType="VARCHAR" />
+    <result column="APPLY_STATE" property="applyState" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    XM_USER_ID, GYS_USER_ID, APPLY_STATE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.XM_GYSExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from XM_GYS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="common.vo.XM_GYSKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from XM_GYS
+    where XM_USER_ID = #{xmUserId,jdbcType=VARCHAR}
+      and GYS_USER_ID = #{gysUserId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="common.vo.XM_GYSKey" >
+    delete from XM_GYS
+    where XM_USER_ID = #{xmUserId,jdbcType=VARCHAR}
+      and GYS_USER_ID = #{gysUserId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.XM_GYSExample" >
+    delete from XM_GYS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.XM_GYS" >
+    insert into XM_GYS (XM_USER_ID, GYS_USER_ID, APPLY_STATE
+      )
+    values (#{xmUserId,jdbcType=VARCHAR}, #{gysUserId,jdbcType=VARCHAR}, #{applyState,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.XM_GYS" >
+    insert into XM_GYS
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="xmUserId != null" >
+        XM_USER_ID,
+      </if>
+      <if test="gysUserId != null" >
+        GYS_USER_ID,
+      </if>
+      <if test="applyState != null" >
+        APPLY_STATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="xmUserId != null" >
+        #{xmUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="gysUserId != null" >
+        #{gysUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="applyState != null" >
+        #{applyState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.XM_GYSExample" resultType="java.lang.Integer" >
+    select count(*) from XM_GYS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update XM_GYS
+    <set >
+      <if test="record.xmUserId != null" >
+        XM_USER_ID = #{record.xmUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gysUserId != null" >
+        GYS_USER_ID = #{record.gysUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyState != null" >
+        APPLY_STATE = #{record.applyState,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update XM_GYS
+    set XM_USER_ID = #{record.xmUserId,jdbcType=VARCHAR},
+      GYS_USER_ID = #{record.gysUserId,jdbcType=VARCHAR},
+      APPLY_STATE = #{record.applyState,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.XM_GYS" >
+    update XM_GYS
+    <set >
+      <if test="applyState != null" >
+        APPLY_STATE = #{applyState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where XM_USER_ID = #{xmUserId,jdbcType=VARCHAR}
+      and GYS_USER_ID = #{gysUserId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.XM_GYS" >
+    update XM_GYS
+    set APPLY_STATE = #{applyState,jdbcType=INTEGER}
+    where XM_USER_ID = #{xmUserId,jdbcType=VARCHAR}
+      and GYS_USER_ID = #{gysUserId,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="removeProjectSuppliersByCompanyID">
+  	DELETE
+	FROM
+		XM_GYS
+	WHERE
+		XM_USER_ID IN(
+			SELECT
+				PROJECT_ID
+			FROM
+				PROJECT t3
+			WHERE
+				t3.COMPANY_ID = #{param1}
+		)
+	AND GYS_USER_ID IN
+	<foreach collection="param2" item="param2" index="index" open="("
+		close=")" separator=",">
+		#{param2}
+	</foreach>
+  </delete>
+  
+  <update id="reReplyProjectSuppliersByID" parameterType="java.lang.String">
+  	update XM_GYS set APPLY_STATE=1
+  	where XM_USER_ID=#{param1}
+  	and GYS_USER_ID=#{param2}
+  </update>
+  
+</mapper>

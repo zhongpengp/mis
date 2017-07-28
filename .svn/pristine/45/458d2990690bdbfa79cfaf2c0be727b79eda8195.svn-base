@@ -1,0 +1,955 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../common/header_fileUpload.jsp"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>设备基础信息导入</title>
+<script type="text/javascript">
+var importProjectMachineInfo_Table_selectProjectID='';
+var importProjectMachineInfo_Table_selectProjectName='';
+var viewImportedMachineDetailModal_Table_selectMachineID='';
+var viewImportedMachineDetailModal_Table_selectMachineName='';
+var viewDetailType='';
+	$(function(){
+		initImportProjectMachineInfo_Table();
+		addModalFormValidator();
+		addModalFormValidator();
+		updateModalFormValidator();
+		
+		$("#addMachineModal_form_reset").on("click",function(){
+			$('#addMachineModal_form').data('bootstrapValidator').resetForm(true);
+		});
+		$("#updateMachineModal_form_reset").on("click",function(){
+			initViewImportedMachineDetailModal_updateModal(viewImportedMachineDetailModal_Table_selectMachineID,viewImportedMachineDetailModal_Table_selectMachineName);
+			$('#updateMachineModal_form').data('bootstrapValidator').resetForm(true);
+		});
+		
+		$('#viewImportedMachineDetailModal').on('hide.bs.modal', function (e) {
+			initImportProjectMachineInfo_Table();
+		});
+		
+		$('#addMachineModal').on('show.bs.modal', function (e) {
+			$('#viewImportedMachineDetailModal').modal("hide");
+			$("#addMachineModal_form")[0].reset();			
+			$('#addMachineModal_form').data('bootstrapValidator').resetForm(true);
+			$("#addMachineModal_Title").text(importProjectMachineInfo_Table_selectProjectName+"项目设备——新增");
+			$("#addMachineModal_form_projectId").val(importProjectMachineInfo_Table_selectProjectID);
+			$("#addMachineModal_form_supplierId").val('<%=userID%>');
+		});
+		$('#addMachineModal').on('hide.bs.modal', function (e) {
+			$('#viewImportedMachineDetailModal').modal("show");
+		});
+		$('#updateMachineModal').on('show.bs.modal', function (e) {
+			$('#viewImportedMachineDetailModal').modal("hide");
+		});
+		$('#updateMachineModal').on('hide.bs.modal', function (e) {
+			$('#viewImportedMachineDetailModal').modal("show");
+		});
+		
+		$('#excelImportModal').on('hide.bs.modal', function (e) {
+			initImportProjectMachineInfo_Table();
+		});
+		$('#excelImportModal').on('show.bs.modal', function (e) {
+			$("#input-index").val("");
+			$("#excelImportForm").show();
+			$("#excelImportForm")[0].reset();
+			$("#importMessageTitle").empty();
+			$("#importMessageBody").empty();
+			$("#selectFileMessage").hide();
+			$("#selectFileTypeMessage").hide();
+			$("#processbar").hide();
+	    });
+		
+		$("#viewImportedMachineDetailModal_addBtn").on("click",function(){
+			$("#addMachineModal").modal("show");
+		});
+		
+		$("#viewImportedMachineDetailModal_updateBtn").on("click",function(){
+			var viewImportedMachineDetailModal_Table_selects = $("#viewImportedMachineDetailModal_Table").bootstrapTable("getSelections");
+			if(viewImportedMachineDetailModal_Table_selects.length==0){
+				alert_warning("修改设备信息","请先选择要修改的项目！");
+			}else if(viewImportedMachineDetailModal_Table_selects.length!=1){
+				alert_warning("修改设备信息","只能选择一个项目进行修改！");
+			}else if(viewImportedMachineDetailModal_Table_selects.length==1){
+				if(viewImportedMachineDetailModal_Table_selects[0].applyState==3){
+					alert_warning("修改设备信息","已审批通过的设备将不能再修改！");
+				}else{
+					viewImportedMachineDetailModal_Table_selectMachineID = viewImportedMachineDetailModal_Table_selects[0].id;
+					viewImportedMachineDetailModal_Table_selectMachineName = viewImportedMachineDetailModal_Table_selects[0].machineName;
+					initViewImportedMachineDetailModal_updateModal(viewImportedMachineDetailModal_Table_selectMachineID,viewImportedMachineDetailModal_Table_selectMachineName);
+				}
+			}
+		});
+		$("#viewImportedMachineDetailModal_deleteBtn").on("click",function(){
+			var viewImportedMachineDetailModal_Table_selects = $("#viewImportedMachineDetailModal_Table").bootstrapTable("getSelections");
+			if(viewImportedMachineDetailModal_Table_selects.length==0){
+				alert_warning("删除设备信息","请先选择要删除的项目！");
+			}else{
+				var machineIDs='';
+				var isRemove = true ;
+				$(viewImportedMachineDetailModal_Table_selects).each(function(index,value){
+					if(value.applyState==3){
+						isRemove=false;
+					}
+					if(index==viewImportedMachineDetailModal_Table_selects.length-1){
+						machineIDs+=value.id;
+					}else{
+						machineIDs+=value.id+",";
+					}
+				});
+				if(isRemove){
+					var dialogInstance = BootstrapDialog.show({
+						title:'删除设备',
+						type:'type-danger',
+						closable:false,
+						message:'您即将删除所选择的设备，是否确认删除？！',
+						buttons:[
+							{
+								label:'取消',
+								action:function(dialog){
+									dialog.close();
+								}
+							},
+							{
+								 icon: 'glyphicon glyphicon-trash',
+								 label:'确认删除',
+								 cssClass:'btn-danger',
+								 autospan:true,
+								 action:function(dialog){
+									 dialog.enableButtons(false);
+									 dialog.setClosable(false);
+									 $.ajax({
+										url:'<%=path%>/projectMachineImportController/removeMachineInfoByIDs',
+										data:{
+											'machineIDs':machineIDs
+										},
+										success:function(data){
+											viewImportedMachineDetail(importProjectMachineInfo_Table_selectProjectID,importProjectMachineInfo_Table_selectProjectName,viewDetailType);
+											dialogInstance.close();
+											BootstrapDialog.alert({
+												title:'删除设备',
+												message:'删除设备成功！',
+												type:'type-success',
+												size:'size-small'
+											});
+										},error:function(data){
+											alert_danger("删除设备","删除设备失败，请重试！");
+										}
+									 });
+								 }
+							}
+							
+						]
+					});
+				}else{
+					alert_danger("删除设备","所选择的设备中包含审批已通过的项目，审批已通过的设备不能删除！");
+				}
+			}
+		});
+	});
+	
+	function initViewImportedMachineDetailModal_updateModal(machineID,machineName){
+		$("#updateMachineModal_Title").text("修改设备信息——"+machineName);
+		$("#update_machineID").val(machineID);
+		$.ajax({
+			url:'<%=path%>/projectMachineImportController/getSingleMachineInfoByID',
+			data:{
+				machineID:machineID
+			},
+			success:function(machine){
+				$("#update_machineName").val(machine.machineName);
+				$("#update_machineClassify").val(machine.machineClassify);
+				$("#update_machineType").val(machine.machineType);
+				$("#update_machineSize").val(machine.machineSize);
+				$("#update_machineNum").val(machine.machineNum);
+				$("#update_rangeJingdu").val(machine.rangeJingdu);
+				$("#update_unit").val(machine.unit);
+				$("#update_unitPrice").val(machine.unitPrice);
+				$("#update_producer").val(machine.producer);
+				$("#update_remark").val(machine.remark);
+				$("#updateMachineModal").modal('show');
+			},
+			error:function(){
+				alert_error("修改设备信息","获取设备信息失败，该设备状态异常，请稍后重试！")
+			}
+		});
+	}
+	
+	function importExcelMachineInfoButton(){
+		var importProjectMachineInfo_Table_selects = $("#importProjectMachineInfo_Table").bootstrapTable("getSelections");
+		if(importProjectMachineInfo_Table_selects.length==0){
+			alert_warning("批量导入设备信息","请先选择要导入的项目！");
+		}else if(importProjectMachineInfo_Table_selects.length!=1){
+			alert_warning("批量导入设备信息","只能选择一个项目进行导入！");
+		}else if(importProjectMachineInfo_Table_selects.length==1){
+			$("#excelImportModal").modal('show');
+			$("#selectedImportProjectID").val(importProjectMachineInfo_Table_selects[0].project_ID);
+		}
+	}
+	
+	function initImportProjectMachineInfo_Table(){
+		$("#importProjectMachineInfo_Table").bootstrapTable("destroy");
+		$("#importProjectMachineInfo_Table").bootstrapTable({
+			url: '<%=path%>/projectMachineImportController/getImportedProjectMachineInfo',
+			method: 'get',
+	        //toolbar: '#toolbar',    //工具按钮用哪个容器
+	        striped: true,      //是否显示行间隔色
+	        cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+	        pagination: true,     //是否显示分页（*）
+	        maintainSelected:true,//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+	        //sortable: false,      //是否启用排序
+	        //sortOrder: "asc",     //排序方式
+	        pageNumber:1,      //初始化加载第一页，默认第一页
+	        pageSize:5,
+	        pageList: [5, 10, 15, 20,25,30,40,50,100],   //可供选择的每页的行数（*）
+	        maintainSelected:true, 	//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+	        queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+	                            // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+	        //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+	        sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+	        search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+	        strictSearch: true,
+	        //showColumns: true,     //是否显示所有的列
+	        //showRefresh: true,     //是否显示刷新按钮
+	        clickToSelect: true,    //是否启用点击选中行
+	        showExport:true,
+	        showFilter:true,
+	        filterControl:true,
+	        filterShowClear:true,
+	        exportTypes:['excel', 'doc',  'pdf', 'png', 'xml', 'csv', 'txt', 'sql','json'],
+	        //queryParams:$("#projectList_gs_searchForm").serialize(),
+			queryParams : function(data) {
+			    data.supplierID='<%=userID %>';
+				return data;
+			},
+			onLoadSuccess:function(data){
+			},
+			columns : [
+				{field : 'check_box', checkbox : true},
+				{field : 'applyState',title:'审批状态',visible : true,
+					formatter:function(value,row,index){
+						if(value==1){
+							return '<font color="orange">待提交审批</font>';
+						}else if(value==3||value==4){
+							return '<font color="green">审批完成</font>';
+						}else if(value==2){
+							return '<font color="blue">审批中</font>';
+						}
+					}
+				},
+				{field : 'project_Name',title:'项目名称',visible : true},
+				{field : 'project_CompanyName',title:'所属公司',visible : true},
+				{field : 'machine_waitSubmitNum',title:'待提交设备',visible : true,
+					formatter:function(value,row,index){
+						if(value=="0"){
+							return value;
+						}else{
+							return '<font color="orange">'+value+'</font><a href="#" onclick="viewImportedMachineDetail(\''+row.project_ID+'\',\''+row.project_Name+'\',\'1\')"> <font color="orange">(查看详情)</font></a>';
+						}
+					}
+				},
+				{field : 'machine_waitApprovalNum',title:'待审批设备',visible : true,
+					formatter:function(value,row,index){
+						if(value=="0"){
+							return value;
+						}else{
+							return '<font color="blue">'+value+'</font><a href="#" onclick="viewImportedMachineDetail(\''+row.project_ID+'\',\''+row.project_Name+'\',\'2\')">  <font color="blue">(查看详情)</font></a>';
+						}
+					}
+				},
+				{field : 'machine_passNum',title:'审批通过设备',visible : true,
+					formatter:function(value,row,index){
+						if(value=="0"){
+							return value;
+						}else{
+							return '<font color="green">'+value+'</font><a href="#" onclick="viewImportedMachineDetail(\''+row.project_ID+'\',\''+row.project_Name+'\',\'3\')">  <font color="green">(查看详情)</font></a>';
+						}
+					}
+				},
+				{field : 'machine_notPassNum',title:'审批未通过设备',visible : true,
+					formatter:function(value,row,index){
+						if(value=="0"){
+							return value;
+						}else{
+							return '<font color="red">'+value+'</font><a href="#" onclick="viewImportedMachineDetail(\''+row.project_ID+'\',\''+row.project_Name+'\',\'4\')">  <font color="red">(查看详情)</font></a>';
+						}
+					}
+				},
+				{field : 'lastImportTime',title:'最近导入时间',visible : true,
+					formatter:function(value,row,index){
+						return getSmpFormatDateByLong(value,true);
+					}
+				},
+		]
+		});
+	}
+	
+	function viewImportedMachineDetail(projectID,projectName,applyState){
+		importProjectMachineInfo_Table_selectProjectID = projectID;
+		importProjectMachineInfo_Table_selectProjectName = projectName;
+		viewDetailType=applyState;
+		if(applyState==1){
+			$("#viewImportedMachineDetailModal_Title").text(projectName+"项目设备（待提交审批）详情");
+		}else if(applyState==2){
+			$("#viewImportedMachineDetailModal_Title").text(projectName+"项目设备（已提交，审批中）详情");
+		}else if(applyState==3){
+			$("#viewImportedMachineDetailModal_Title").text(projectName+"项目设备（审批通过）详情");
+		}
+		else if(applyState==4){
+			$("#viewImportedMachineDetailModal_Title").text(projectName+"项目设备（审批未通过）详情");
+		}else{
+			$("#viewImportedMachineDetailModal_Title").text(projectName+"项目设备详情");
+		}
+		
+		$("#viewImportedMachineDetailModal_Table").bootstrapTable("destroy");
+		$("#viewImportedMachineDetailModal_Table").bootstrapTable({
+			url: '<%=path%>/projectMachineImportController/getImportedMachineDetail',
+			method: 'get',
+	        //toolbar: '#toolbar',    //工具按钮用哪个容器
+	        striped: true,      //是否显示行间隔色
+	        cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+	        pagination: true,     //是否显示分页（*）
+	        maintainSelected:true,//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+	        //sortable: false,      //是否启用排序
+	        //sortOrder: "asc",     //排序方式
+	        pageNumber:1,      //初始化加载第一页，默认第一页
+	        pageSize:5,
+	        pageList: [5, 10, 15, 20,25,30,40,50,100],  //可供选择的每页的行数（*）
+	        maintainSelected:true, 	//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+	        queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+	                            // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+	        //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+	        sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+	        search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+	        strictSearch: true,
+	        //showColumns: true,     //是否显示所有的列
+	        //showRefresh: true,     //是否显示刷新按钮
+	        clickToSelect: true,    //是否启用点击选中行
+	        showExport:true,
+	        showFilter:true,
+	        filterControl:true,
+	        filterShowClear:true,
+	        exportTypes:['excel', 'doc',  'pdf', 'png', 'xml', 'csv', 'txt', 'sql','json'],
+	        //queryParams:$("#projectList_gs_searchForm").serialize(),
+			queryParams : function(data) {
+			    data.supplierID='<%=userID %>';
+			    data.projectID=projectID;
+			    data.applyState=applyState;
+				return data;
+			},
+			onLoadSuccess:function(data){
+			},
+			columns : [
+				{field : 'check_box', checkbox : true},
+				{field : 'applyState',title:'状态',visible : true,
+					formatter:function(value,row,index){
+						if(value==1){
+							return '<font color="orange">待提交审批</font>';
+						}else if(value==3){
+							return '<font color="green">审批通过</font>';
+						}else if(value==2){
+							return '<font color="blue">审批中</font>';
+						}else if(value==4){
+							return '<font color="red">审批未通过</font>';
+						}
+					}
+				},
+				{field : 'machineClassify',title:'类型',visible : true},
+				{field : 'machineName',title:'名称',visible : true},
+				{field : 'machineType',title:'型号',visible : true},
+				{field : 'machineSize',title:'规格',visible : true},
+				{field : 'rangeJingdu',title:'度量精度',visible : true},
+				{field : 'unit',title:'单位',visible : true},
+				{field : 'machineNum',title:'数量',visible : true},
+				{field : 'unitPrice',title:'单价',visible : true},
+				{field : 'totalPrice',title:'总价',visible : true,
+					formatter:function(value,row,index){
+						return row.machineNum*row.unitPrice;
+					}
+				},
+				{field : 'producer',title:'生产厂家',visible : true},
+				{field : 'remark',title:'备注',visible : false},
+				{field : 'applyTime',title:'导入时间',visible : true,
+					formatter:function(value,row,index){
+						return getSmpFormatDateByLong(value,true);
+					}
+				}
+		]
+		});
+		$("#viewImportedMachineDetailModal").modal("show");
+	}
+	
+	function  toViewImportedMachineDetail(){
+		var importProjectMachineInfo_Table_selects = $("#importProjectMachineInfo_Table").bootstrapTable("getSelections");
+		if(importProjectMachineInfo_Table_selects.length==0){
+			alert_warning("查看设备详情","请先选择要查看的项目！");
+		}else if(importProjectMachineInfo_Table_selects.length!=1){
+			alert_warning("查看设备详情","只能选择一个项目进行查看！");
+		}else if(importProjectMachineInfo_Table_selects.length==1){
+			importProjectMachineInfo_Table_selectProjectID = importProjectMachineInfo_Table_selects[0].project_ID;
+			importProjectMachineInfo_Table_selectProjectName = importProjectMachineInfo_Table_selects[0].project_Name;
+			viewImportedMachineDetail(importProjectMachineInfo_Table_selectProjectID,importProjectMachineInfo_Table_selectProjectName,0);
+		}
+	}
+	
+	function  toSubmitMachineApprovalApply(){
+		var importProjectMachineInfo_Table_selects = $("#importProjectMachineInfo_Table").bootstrapTable("getSelections");
+		if(importProjectMachineInfo_Table_selects.length==0){
+			alert_warning("提交设备审批申请","请先选择要提交设备审批申请的项目！");
+		}else{
+			var projectIDs = '';
+			$(importProjectMachineInfo_Table_selects).each(function(index,value){
+				if(index==importProjectMachineInfo_Table_selects.length-1){
+					projectIDs+=value.project_ID;
+				}else{
+					projectIDs+=value.project_ID+",";
+				}
+			});
+			var dialogInstance = BootstrapDialog.show({
+				title:'提交设备审批申请',
+				type:'type-info',
+				closable:false,
+				message:'提交设备审批申请，是否确认提交？！',
+				buttons:[
+					{
+						label:'取消',
+						action:function(dialog){
+							dialog.close();
+						}
+					},
+					{
+						 icon: 'glyphicon glyphicon-ok',
+						 label:'确认提交',
+						 cssClass:'btn-success',
+						 autospan:true,
+						 action:function(dialog){
+							 dialog.enableButtons(false);
+							 dialog.setClosable(false);
+							 $.ajax({
+								url:'<%=path%>/projectMachineImportController/toSubmitMachineApprovalApply',
+								data:{
+									'projectIDs':projectIDs,
+									'supplierID':'<%=userID%>'
+								},
+								success:function(data){
+									initImportProjectMachineInfo_Table();
+									dialogInstance.close();
+									BootstrapDialog.alert({
+										title:'提交设备审批申请',
+										message:'提交设备审批申请成功！',
+										type:'type-success',
+										size:'size-small'
+									});
+								},error:function(data){
+									alert_danger("提交设备审批申请","提交设备审批申请失败，请重试！");
+								}
+							 });
+						 }
+					}
+					
+				]
+			});
+		}
+	}
+	
+	function addModalFormValidator(){
+		$('#addMachineModal_form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {/*输入框不同状态，显示图片的样式*/
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {/*验证*/
+            	machineName: {/*键名username和input name值对应*/
+                    message: '名称无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '名称不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '名称长度必须小于100'
+                        }
+                    }
+                },
+                machineType: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '型号不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '型号长度必须小于100'
+                        }
+                    }
+                },
+                machineSize: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '规格不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '规格长度必须小于100'
+                        }
+                    }
+                },
+                rangeJingdu: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '精度不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '精度长度必须小于100'
+                        }
+                    }
+                },
+                unit: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '单位不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '单位长度必须小于100'
+                        }
+                    }
+                },
+                producer: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '生产厂家不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '生产厂家长度必须小于100'
+                        }
+                    }
+                },
+                remark: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        stringLength: {/*长度提示*/
+                            max: 1000,
+                            message: '备注长度必须小于2000'
+                        }
+                    }
+                },
+                machineNum: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '数量不能为空'
+                        },
+                        regexp: {
+                            regexp: /^\d+$/,
+                            message: '请输入整数'
+                        }
+                    }
+                },
+                unitPrice: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '单价不能为空'
+                        },
+                        regexp: {
+                            regexp:  /^[0-9]+([.]{1}[0-9]+){0,1}$/,
+                            message: '请输入正确的价格'
+                        }
+                    }
+                },
+            }
+        });
+	}
+	function updateModalFormValidator(){
+		$('#updateMachineModal_form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {/*输入框不同状态，显示图片的样式*/
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {/*验证*/
+            	machineName: {/*键名username和input name值对应*/
+                    message: '名称无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '名称不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '名称长度必须小于100'
+                        }
+                    }
+                },
+                machineType: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '型号不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '型号长度必须小于100'
+                        }
+                    }
+                },
+                machineSize: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '规格不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '规格长度必须小于100'
+                        }
+                    }
+                },
+                rangeJingdu: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '精度不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '精度长度必须小于100'
+                        }
+                    }
+                },
+                unit: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '单位不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '单位长度必须小于100'
+                        }
+                    }
+                },
+                producer: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '生产厂家不能为空'
+                        },
+                        stringLength: {/*长度提示*/
+                            max: 100,
+                            message: '生产厂家长度必须小于100'
+                        }
+                    }
+                },
+                remark: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        stringLength: {/*长度提示*/
+                            max: 1000,
+                            message: '备注长度必须小于2000'
+                        }
+                    }
+                },
+                machineNum: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '数量不能为空'
+                        },
+                        regexp: {
+                            regexp: /^\d+$/,
+                            message: '请输入整数'
+                        }
+                    }
+                },
+                unitPrice: {/*键名username和input name值对应*/
+                    message: '无效',
+                    validators: {
+                        notEmpty: {/*非空提示*/
+                            message: '单价不能为空'
+                        },
+                        regexp: {
+                            regexp:  /^[0-9]+([.]{1}[0-9]+){0,1}$/,
+                            message: '请输入正确的价格'
+                        }
+                    }
+                },
+            }
+        });
+	}
+	function addMachineModal_form_add(){
+		$("#addMachineModal_form").bootstrapValidator('validate');
+		var isValid = $("#addMachineModal_form").data("bootstrapValidator").isValid();
+		if(isValid==true){
+			$.ajax({
+				url:'<%=path%>/projectMachineImportController/addSingleMachine',
+				data:$("#addMachineModal_form").serialize(),
+				success:function(data){
+					$("#addMachineModal").modal("hide");
+					alert_success("添加设备","添加设备成功！");
+					viewImportedMachineDetail(importProjectMachineInfo_Table_selectProjectID,importProjectMachineInfo_Table_selectProjectName,viewDetailType);
+				},
+				error:function(){
+					alert_danger("添加设备","添加设备失败，请重试！");
+				}
+			});
+		}
+	}
+	function updateMachineModal_form_update(){
+		$("#updateMachineModal_form").bootstrapValidator('validate');
+		var isValid = $("#updateMachineModal_form").data("bootstrapValidator").isValid();
+		if(isValid==true){
+			$.ajax({
+				url:'<%=path%>/projectMachineImportController/updateSingleMachine',
+				data:$("#updateMachineModal_form").serialize(),
+				success:function(data){
+					$("#updateMachineModal").modal("hide");
+					alert_success("修改设备信息","修改设备信息成功！");
+					viewImportedMachineDetail(importProjectMachineInfo_Table_selectProjectID,importProjectMachineInfo_Table_selectProjectName,viewDetailType);
+				},
+				error:function(){
+					alert_danger("修改设备信息","修改设备信息失败，请重试！");
+				}
+			});
+		}
+	}
+</script>
+</head>
+<body>
+	<div class="container" style="margin: 0 0 0 0 ;width: 100%;">
+		<div class="page-content-wrapper">
+			<div class="page-content-wrapper">
+				<div id=page_title>
+					<ul class="breadcrumb" style="margin-bottom:0;">   
+						<li>    设备管理</li>  
+						<li class="active">设备基础信息管理</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 3px">
+			<div class="col-sm-12" style="width: 100%">
+				<div id="importProjectMachineInfo_Table_Toolbar" >
+					<button type="button" class="btn btn-info" onClick="toViewImportedMachineDetail()">查看设备详情</button>
+					<button type="button" class="btn btn-primary" onClick="importExcelMachineInfoButton()">批量导入设备</button>
+					<button type="button" class="btn btn-success" onClick="toSubmitMachineApprovalApply()">提交设备审批申请</button>
+				</div>
+				<table id="importProjectMachineInfo_Table" class="table table-condensed" data-toolbar="#importProjectMachineInfo_Table_Toolbar"data-toggle="table" data-striped="true" data-search="true"  data-show-columns="true">
+					<thead style="background-color: #87CEFF"></thead>
+				</table>
+			</div>
+		</div>
+		
+		<!-- Modal excelImport-->
+		<div class="modal fade" id="excelImportModal" tabindex="-1" role="dialog"
+			aria-labelledby="excelImportModalLabel" aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" style="width: 80%">
+				<div class="modal-content">
+					<div id="excelImportModalBody" class="modal-body" style="padding-top: 0;padding-bottom: 0">
+						<jsp:include page="excelUpload.jsp"></jsp:include>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<!-- Modal -->
+				<!-- 模态框（Modal） -->
+		<div class="modal fade" id="viewImportedMachineDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		    <div class="modal-dialog" style="width: 80%">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                <h4 class="modal-title" id="viewImportedMachineDetailModal_Title"></h4>
+		            </div>
+		            <div class="modal-body" id="viewImportedMachineDetailModalBody">
+	            		<div class="row" style="margin-top: 3px">
+							<div class="col-sm-12" style="width: 100%">
+								<div id="viewImportedMachineDetailModal_Table_Toolbar" >
+									<button type="button" class="btn btn-success" id="viewImportedMachineDetailModal_addBtn">新增</button>
+									<button type="button" class="btn btn-warning" id="viewImportedMachineDetailModal_updateBtn">修改</button>
+									<button type="button" class="btn btn-danger" id="viewImportedMachineDetailModal_deleteBtn">删除</button>
+								</div>
+								<table id="viewImportedMachineDetailModal_Table" class="table table-condensed" data-toolbar="#viewImportedMachineDetailModal_Table_Toolbar"data-toggle="table" data-striped="true" data-search="true"  data-show-columns="true">
+									<thead style="background-color: #87CEFF"></thead>
+								</table>
+							</div>
+						</div>
+					</div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal -->
+		</div>
+		
+						<!-- 模态框（Modal） -->
+		<div class="modal fade" id="addMachineModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		    <div class="modal-dialog" style="width: 80%">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                <h4 class="modal-title" id="addMachineModal_Title"></h4>
+		            </div>
+		            <div class="modal-body" id="addMachineModal_Body">
+						<form id="addMachineModal_form" class="form-horizontal" role="form">
+							<input type="text" name="projectId" id="addMachineModal_form_projectId" style="display: none">
+							<input type="text" name="supplierId" id="addMachineModal_form_supplierId" style="display: none">
+						  <div class="form-group">
+						    <label for="machineName" class="col-sm-2 control-label">设备名称</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" name="machineName" id="machineName" placeholder="请输入设备名称">
+						    </div>
+						    <label for="machineClassify" class="col-sm-2 control-label">类型</label>
+						    <div class="col-sm-4">
+						      <select class="form-control" name="machineClassify" id="machineClassify">
+							      <option value="设备">设备</option>
+							      <option value="耗材">耗材</option>
+							    </select>
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="machineType" class="col-sm-2 control-label">型号</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="machineType"  name="machineType"placeholder="请输入设备型号">
+						    </div>
+						    <label for="machineSize" class="col-sm-2 control-label">规格</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="machineSize" name="machineSize" placeholder="请输入设备规格">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="machineNum" class="col-sm-2 control-label">数量</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="machineNum" name="machineNum"placeholder="请输入设备数量">
+						    </div>
+						    <label for="rangeJingdu" class="col-sm-2 control-label">量程精度</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="rangeJingdu" name="rangeJingdu" placeholder="请输入设备量程精度">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="unit" class="col-sm-2 control-label">计量单位</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="unit" name="unit"placeholder="请输入设备计量单位">
+						    </div>
+						    <label for="unitPrice" class="col-sm-2 control-label">单价(元)</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="unitPrice" name="unitPrice"placeholder="请输入设备单价">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="producer" class="col-sm-2 control-label">生产厂家</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="producer" name="producer" placeholder="请输入设备生产厂家">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="remark" class="col-sm-2 control-label">备注</label>
+						    <div class="col-sm-10">
+						      <textarea rows="3" cols="" class="form-control" id="remark" name="remark" placeholder="请输入设备备注">
+						    </textarea>
+						  	</div>
+						  </div>
+						  
+						</form>
+					</div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		                <button type="button" class="btn btn-primary" id="addMachineModal_form_reset">重置</button>
+		                <button type="button" class="btn btn-success" onclick="addMachineModal_form_add()">添加</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal -->
+		</div>
+		
+		<div class="modal fade" id="updateMachineModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		    <div class="modal-dialog" style="width: 80%">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                <h4 class="modal-title" id="updateMachineModal_Title"></h4>
+		            </div>
+		            <div class="modal-body" id="updateMachineModal_Body">
+						<form id="updateMachineModal_form" class="form-horizontal" role="form">
+							<input type="text" id="update_machineID" name="id" style="display: none">
+						  <div class="form-group">
+						    <label for="machineName" class="col-sm-2 control-label">设备名称</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" name="machineName" id="update_machineName" placeholder="请输入设备名称">
+						    </div>
+						    <label for="machineClassify" class="col-sm-2 control-label">类型</label>
+						    <div class="col-sm-4">
+						      <select class="form-control" name="machineClassify" id="update_machineClassify">
+							      <option value="设备">设备</option>
+							      <option value="耗材">耗材</option>
+							    </select>
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="machineType" class="col-sm-2 control-label">型号</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_machineType"  name="machineType"placeholder="请输入设备型号">
+						    </div>
+						    <label for="machineSize" class="col-sm-2 control-label">规格</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_machineSize" name="machineSize" placeholder="请输入设备规格">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="machineNum" class="col-sm-2 control-label">数量</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_machineNum" name="machineNum"placeholder="请输入设备数量">
+						    </div>
+						    <label for="rangeJingdu" class="col-sm-2 control-label">量程精度</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_rangeJingdu" name="rangeJingdu" placeholder="请输入设备量程精度">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="unit" class="col-sm-2 control-label">计量单位</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_unit" name="unit"placeholder="请输入设备计量单位">
+						    </div>
+						    <label for="unitPrice" class="col-sm-2 control-label">单价(元)</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_unitPrice" name="unitPrice"placeholder="请输入设备单价">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="producer" class="col-sm-2 control-label">生产厂家</label>
+						    <div class="col-sm-4">
+						      <input type="text" class="form-control" id="update_producer" name="producer" placeholder="请输入设备生产厂家">
+						    </div>
+						  </div>
+						  <div class="form-group">
+						    <label for="remark" class="col-sm-2 control-label">备注</label>
+						    <div class="col-sm-10">
+						      <textarea rows="3" cols="" class="form-control" id="update_remark" name="remark" placeholder="请输入设备备注">
+						    </textarea>
+						  	</div>
+						  </div>
+						  
+						</form>
+					</div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		                <button type="button" class="btn btn-primary" id="updateMachineModal_form_reset">重置</button>
+		                <button type="button" class="btn btn-success" onclick="updateMachineModal_form_update()">确认修改</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal -->
+		</div>
+	</div>
+</body>
+</html>

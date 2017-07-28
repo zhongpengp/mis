@@ -1,0 +1,178 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../common/header.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>新增消息</title>
+<script type="text/javascript" src="<%=path %>/js/jquery-form.js"></script>
+<script type="text/javascript">
+	var userType = '<%=request.getSession().getAttribute("userType")%>';
+	var userID = '<%=request.getSession().getAttribute("userID")%>';
+	$(function(){
+		getProjectInfo();
+		$("#input-file").fileinput({
+			language : 'zh', //
+			showUpload : false,
+			maxFileCount : 1
+		});
+		$("#successMessage").hide();
+		$("#errorMessage").hide();
+		$('#addNewMessageForm').validate({  
+	           errorElement : 'span',  
+	           errorClass : 'help-block',  
+	           focusInvalid : false,  
+	           rules : {  
+	        	   messageTheme : {required : true, maxlength : 60},
+	        	   recevieUserId : {required : true},  
+	        	   messageSend : {required : true, maxlength : 500}
+	           },  
+	           
+	           messages : {  
+	        	   messageTheme : {required : "消息主题必填", maxlength : "最大长度60"},  
+	        	   recevieUserId : {required : "收件人必填"},  
+	        	   messageSend : {required : "消息内容必填必填", maxlength : "最大长度500"}
+	        	   
+	           },  
+	 
+	           highlight : function(element) {  
+	               $(element).closest('.data-validate').addClass('has-error');  
+	           },  
+	 
+	           success : function(label) {  
+	               label.closest('.data-validate').removeClass('has-error');  
+	               label.remove();  
+	           },  
+	 
+	           errorPlacement : function(error, element) {  
+	        	   element.parent('div').append(error);  
+	           }  
+		});
+		
+		var options = {   
+	            type: 'POST',  
+	            url: "<%=path%>/message/msgFileUpload.do",
+	            dataType: 'text', 
+	            success : function(data) {
+	            	if(data=="success"){
+	            		alert_success('【上传结果】','上传成功！');
+	            		$('#addNewMessageForm')[0].reset();
+	            	}else{
+	            		alert_warning('【上传结果】','上传失败！');
+	            		$('#addNewMessageForm')[0].reset();
+	            	}
+	            },
+	            error : function(xhr, status, err) {
+	            	alert_warning('【上传结果】','上传失败！');
+	            	$('#addNewMessageForm')[0].reset();
+	            }  
+	        };   
+	        $("#addNewMessageForm").submit(function(){   
+	            $(this).ajaxSubmit(options);   
+	            return false;   //防止表单自动提交  
+	        });
+		 
+	});
+	
+	//获取发送人
+	function getProjectInfo(){
+		var theUrl = "<%=path %>/message/getUserByType.do"
+		$.ajax({
+          url : theUrl,
+          contentType : "application/json;charset=utf-8",
+          data:{"userType":userType,"userID":userID}, 
+       	  cache:false,
+          success : function(data) {
+        	  $("#recevieUser").empty();
+        	  for (var i = 0; i < data.length; i++) {
+       			  $("#recevieUser").append("<option value=" + data[i].userId+ ">"+ data[i].loginName + "</option>");
+              }
+              $("#recevieUser").selectpicker('val', '');
+              $("#recevieUser").selectpicker('refresh');
+          },
+          error : function(request) {
+        	  alert("查询收件人出错！");
+          }
+      });
+	}
+	
+	function saveNewMessage(){
+		if ($('#addNewMessageForm').validate().form()){
+			$("#recevieUserId").val($("#recevieUser").val())
+			$("#selectFileMessage").hide();
+			$("#selectFileTypeMessage").hide();
+			var filenamee = $("#input-file").val();
+			var point = filenamee.lastIndexOf("."); 
+		    var type = filenamee.substr(point);
+			$("#successMessage").hide();
+			var filestr = $("#input-file").val();
+			var catalogstr = $("#selectCatalogTreeName").val();
+			if(filestr!=null&&filestr!=""){
+				if(type!=".xls"&&type!=".xlsx"&&type!=".doc"&&type!=".docx"){
+					$("#selectFileTypeMessage").show();
+					return false;
+				}
+			}
+			$("#addNewMessageForm").submit();
+		}
+	}
+	//取消
+	function reload(){
+		location.reload();
+	}
+</script>
+</head>
+<body>
+<div class="container" style="margin:10px;width: 98%;">
+	<div id=page_title>
+		<ul class="breadcrumb" style="margin-bottom:0;">   
+			<li>消息中心</li>  
+			<li class="active">发送消息</li>
+		</ul>
+	</div>
+	<div id="viewAddModelDiv" style="margin-top: 20px;">
+			<iframe name="hiddenIFrame" id="hiddenIFrame" style="display:none"></iframe>
+			<form name="addNewMessageForm" id="addNewMessageForm" class="form-horizontal"  method="post" action="<%=path%>/message/msgFileUpload.do"  enctype="multipart/form-data" target="hiddenIFrame">
+			<div class="form-group data-validate">
+				<label for="messageTheme" class="col-md-2 control-label">消息主题</label>
+				<div class="col-md-8 data-validate">
+					<input id="messageTheme" class="form-control" name="messageTheme" type="text" />
+				</div>
+			</div>
+ 			<div class="form-group">
+				<label for="recevieUserId" class="col-md-2 control-label">收件人</label>
+				<div class="col-xs-8 data-validate">
+					<select name=recevieUser id="recevieUser" data-width="100%" class="selectpicker show-tick" multiple placeholder="请选择。。。">
+					</select>
+					<input type="hidden" id="recevieUserId" name="recevieUserId"/>
+				</div>				
+			</div>	           
+			<div class="form-group">
+				<label for="messageSend" class="col-md-2 control-label">消息内容</label>
+				<div class="col-md-8 data-validate">
+					<textarea name="messageSend" id="messageSend" rows="3" class="form-control" ></textarea>
+				</div>
+			</div>
+            
+			<div class="form-group">
+             	<label for="taskNo" class="col-md-2 control-label">消息附件</label>
+				<div class="col-md-8 data-validate">	
+					<input id="input-file" type="file" id="file" name="file" data-show-preview="false"/>
+				    <div align="center" id="selectFileMessage" style="display: none"><font color="red">请选择要上传的文件！</font> </div>
+				    <div align="center" id="selectFileTypeMessage" style="display: none"><font color="red">该文件类型不允许上传，请重新选择！</font> </div>
+				</div>
+			</div>
+			<div class="form-group">
+				<font id="successMessage" color="green">上传成功！</font>
+				<font id="errorMessage" color="red">上传失败，请重试！</font>
+			</div>
+			</form>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-warning" onclick="reload()">取消</button>
+				<button type="button" class="btn btn-primary" onclick="saveNewMessage()">保存</button>
+			</div>
+	</div>
+</div>
+</body>
+</html>

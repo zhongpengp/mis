@@ -1,0 +1,35 @@
+package project.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import project.service.ProjectVOService;
+import project.vo.ProjectReturnVO;
+import project.vo.ProjectVO;
+
+@Controller
+@RequestMapping("/projectMng")
+@EnableWebMvc
+public class ProjectController {
+	@Autowired
+	private ProjectVOService projectService;
+	
+	@ResponseBody
+	@RequestMapping("getProjectList")
+	public List<ProjectReturnVO> getProjectList(ProjectVO vo){
+		List<ProjectReturnVO> result= projectService.getProjectList(vo);
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("logoutProject")
+	public void logoutProject(String projectID){
+		projectService.logoutProject(projectID);
+	}
+	
+}

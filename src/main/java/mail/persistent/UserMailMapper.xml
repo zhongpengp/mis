@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mail.persistent.UserMailMapper" >
+  <resultMap id="BaseResultMap" type="mail.vo.UserMail" >
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="mail_address" property="mailAddress" jdbcType="VARCHAR" />
+    <result column="mail_smtp_host" property="mailSmtpHost" jdbcType="VARCHAR" />
+    <result column="mail_smtp_port" property="mailSmtpPort" jdbcType="VARCHAR" />
+    <result column="mail_auth_user" property="mailAuthUser" jdbcType="VARCHAR" />
+    <result column="mail_auth_password" property="mailAuthPassword" jdbcType="VARCHAR" />
+    <result column="mail_name" property="mailName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    user_id, mail_address, mail_smtp_host, mail_smtp_port, mail_auth_user, mail_auth_password, 
+    mail_name
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="mail.vo.UserMailExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from USER_MAIL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from USER_MAIL
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from USER_MAIL
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="mail.vo.UserMailExample" >
+    delete from USER_MAIL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="mail.vo.UserMail" >
+    insert into USER_MAIL (user_id, mail_address, mail_smtp_host, 
+      mail_smtp_port, mail_auth_user, mail_auth_password, 
+      mail_name)
+    values (#{userId,jdbcType=VARCHAR}, #{mailAddress,jdbcType=VARCHAR}, #{mailSmtpHost,jdbcType=VARCHAR}, 
+      #{mailSmtpPort,jdbcType=VARCHAR}, #{mailAuthUser,jdbcType=VARCHAR}, #{mailAuthPassword,jdbcType=VARCHAR}, 
+      #{mailName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="mail.vo.UserMail" >
+    insert into USER_MAIL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="mailAddress != null" >
+        mail_address,
+      </if>
+      <if test="mailSmtpHost != null" >
+        mail_smtp_host,
+      </if>
+      <if test="mailSmtpPort != null" >
+        mail_smtp_port,
+      </if>
+      <if test="mailAuthUser != null" >
+        mail_auth_user,
+      </if>
+      <if test="mailAuthPassword != null" >
+        mail_auth_password,
+      </if>
+      <if test="mailName != null" >
+        mail_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="mailAddress != null" >
+        #{mailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="mailSmtpHost != null" >
+        #{mailSmtpHost,jdbcType=VARCHAR},
+      </if>
+      <if test="mailSmtpPort != null" >
+        #{mailSmtpPort,jdbcType=VARCHAR},
+      </if>
+      <if test="mailAuthUser != null" >
+        #{mailAuthUser,jdbcType=VARCHAR},
+      </if>
+      <if test="mailAuthPassword != null" >
+        #{mailAuthPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="mailName != null" >
+        #{mailName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="mail.vo.UserMailExample" resultType="java.lang.Integer" >
+    select count(*) from USER_MAIL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update USER_MAIL
+    <set >
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailAddress != null" >
+        mail_address = #{record.mailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailSmtpHost != null" >
+        mail_smtp_host = #{record.mailSmtpHost,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailSmtpPort != null" >
+        mail_smtp_port = #{record.mailSmtpPort,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailAuthUser != null" >
+        mail_auth_user = #{record.mailAuthUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailAuthPassword != null" >
+        mail_auth_password = #{record.mailAuthPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mailName != null" >
+        mail_name = #{record.mailName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update USER_MAIL
+    set user_id = #{record.userId,jdbcType=VARCHAR},
+      mail_address = #{record.mailAddress,jdbcType=VARCHAR},
+      mail_smtp_host = #{record.mailSmtpHost,jdbcType=VARCHAR},
+      mail_smtp_port = #{record.mailSmtpPort,jdbcType=VARCHAR},
+      mail_auth_user = #{record.mailAuthUser,jdbcType=VARCHAR},
+      mail_auth_password = #{record.mailAuthPassword,jdbcType=VARCHAR},
+      mail_name = #{record.mailName,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="mail.vo.UserMail" >
+    update USER_MAIL
+    <set >
+      <if test="mailAddress != null" >
+        mail_address = #{mailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="mailSmtpHost != null" >
+        mail_smtp_host = #{mailSmtpHost,jdbcType=VARCHAR},
+      </if>
+      <if test="mailSmtpPort != null" >
+        mail_smtp_port = #{mailSmtpPort,jdbcType=VARCHAR},
+      </if>
+      <if test="mailAuthUser != null" >
+        mail_auth_user = #{mailAuthUser,jdbcType=VARCHAR},
+      </if>
+      <if test="mailAuthPassword != null" >
+        mail_auth_password = #{mailAuthPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="mailName != null" >
+        mail_name = #{mailName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="mail.vo.UserMail" >
+    update USER_MAIL
+    set mail_address = #{mailAddress,jdbcType=VARCHAR},
+      mail_smtp_host = #{mailSmtpHost,jdbcType=VARCHAR},
+      mail_smtp_port = #{mailSmtpPort,jdbcType=VARCHAR},
+      mail_auth_user = #{mailAuthUser,jdbcType=VARCHAR},
+      mail_auth_password = #{mailAuthPassword,jdbcType=VARCHAR},
+      mail_name = #{mailName,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+</mapper>

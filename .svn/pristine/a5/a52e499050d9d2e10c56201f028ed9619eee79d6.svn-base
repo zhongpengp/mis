@@ -1,0 +1,45 @@
+package baseMachineMng.persistent;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import baseMachineMng.vo.ImportProjectMachineInfoReturnVO;
+import baseMachineMng.vo.ImportProjectMachineInfo_gsReturnVO;
+import baseMachineMng.vo.Project_Instrument_Info_Temp;
+import baseMachineMng.vo.Project_Instrument_Info_TempExample;
+
+public interface Project_Instrument_Info_TempMapper {
+    int countByExample(Project_Instrument_Info_TempExample example);
+
+    int deleteByExample(Project_Instrument_Info_TempExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(Project_Instrument_Info_Temp record);
+
+    int insertSelective(Project_Instrument_Info_Temp record);
+
+    List<Project_Instrument_Info_Temp> selectByExample(Project_Instrument_Info_TempExample example);
+
+    Project_Instrument_Info_Temp selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") Project_Instrument_Info_Temp record, @Param("example") Project_Instrument_Info_TempExample example);
+
+    int updateByExample(@Param("record") Project_Instrument_Info_Temp record, @Param("example") Project_Instrument_Info_TempExample example);
+
+    int updateByPrimaryKeySelective(Project_Instrument_Info_Temp record);
+
+    int updateByPrimaryKey(Project_Instrument_Info_Temp record);
+    
+    List<ImportProjectMachineInfoReturnVO> getImportedProjectMachineInfo(String supplierID);
+
+	void toSubmitMachineApprovalApply(List<String> asList, String supplierID);
+
+	List<ImportProjectMachineInfo_gsReturnVO> getImportedProjectMachineInfo_gs(String companyID);
+
+	void toPassApprovalApply(List<String> asList);
+
+	void toNotPassApprovalApply(List<String> machineIDList);
+}

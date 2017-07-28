@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.persistent.SupplierMapper" >
+  <resultMap id="BaseResultMap" type="common.vo.Supplier" >
+    <id column="SUPPLIER_ID" property="supplierId" jdbcType="VARCHAR" />
+    <result column="SUPPLIER_NAME" property="supplierName" jdbcType="VARCHAR" />
+    <result column="SUPPLIER_STATE" property="supplierState" jdbcType="INTEGER" />
+    <result column="SUPPLIER_DESC" property="supplierDesc" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    SUPPLIER_ID, SUPPLIER_NAME, SUPPLIER_STATE, SUPPLIER_DESC
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="common.vo.SupplierExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from SUPPLIER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SUPPLIER
+    where SUPPLIER_ID = #{supplierId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SUPPLIER
+    where SUPPLIER_ID = #{supplierId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="common.vo.SupplierExample" >
+    delete from SUPPLIER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="common.vo.Supplier" >
+    insert into SUPPLIER (SUPPLIER_ID, SUPPLIER_NAME, SUPPLIER_STATE, 
+      SUPPLIER_DESC)
+    values (#{supplierId,jdbcType=VARCHAR}, #{supplierName,jdbcType=VARCHAR}, #{supplierState,jdbcType=INTEGER}, 
+      #{supplierDesc,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="common.vo.Supplier" >
+    insert into SUPPLIER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        SUPPLIER_ID,
+      </if>
+      <if test="supplierName != null" >
+        SUPPLIER_NAME,
+      </if>
+      <if test="supplierState != null" >
+        SUPPLIER_STATE,
+      </if>
+      <if test="supplierDesc != null" >
+        SUPPLIER_DESC,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierState != null" >
+        #{supplierState,jdbcType=INTEGER},
+      </if>
+      <if test="supplierDesc != null" >
+        #{supplierDesc,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="common.vo.SupplierExample" resultType="java.lang.Integer" >
+    select count(*) from SUPPLIER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update SUPPLIER
+    <set >
+      <if test="record.supplierId != null" >
+        SUPPLIER_ID = #{record.supplierId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplierName != null" >
+        SUPPLIER_NAME = #{record.supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplierState != null" >
+        SUPPLIER_STATE = #{record.supplierState,jdbcType=INTEGER},
+      </if>
+      <if test="record.supplierDesc != null" >
+        SUPPLIER_DESC = #{record.supplierDesc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update SUPPLIER
+    set SUPPLIER_ID = #{record.supplierId,jdbcType=VARCHAR},
+      SUPPLIER_NAME = #{record.supplierName,jdbcType=VARCHAR},
+      SUPPLIER_STATE = #{record.supplierState,jdbcType=INTEGER},
+      SUPPLIER_DESC = #{record.supplierDesc,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="common.vo.Supplier" >
+    update SUPPLIER
+    <set >
+      <if test="supplierName != null" >
+        SUPPLIER_NAME = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierState != null" >
+        SUPPLIER_STATE = #{supplierState,jdbcType=INTEGER},
+      </if>
+      <if test="supplierDesc != null" >
+        SUPPLIER_DESC = #{supplierDesc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SUPPLIER_ID = #{supplierId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="common.vo.Supplier" >
+    update SUPPLIER
+    set SUPPLIER_NAME = #{supplierName,jdbcType=VARCHAR},
+      SUPPLIER_STATE = #{supplierState,jdbcType=INTEGER},
+      SUPPLIER_DESC = #{supplierDesc,jdbcType=VARCHAR}
+    where SUPPLIER_ID = #{supplierId,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="getCompanySuppliers" parameterType="java.lang.String" resultType="supplierMng.vo.SuppliersRetuenVO">
+  	SELECT
+		t1.APPLY_STATE AS applyState ,
+		t2.SUPPLIER_ID AS supplier_ID ,
+		t2.SUPPLIER_NAME AS supplier_Name ,
+		t2.SUPPLIER_STATE AS supplier_State ,
+		t2.SUPPLIER_DESC AS supplier_Desc ,
+		t3.USER_NAME AS user_name ,
+		t3.PHONE_NUM AS user_phone ,
+		t4.mail_address AS user_email
+	FROM
+		GS_GYS t1
+	LEFT JOIN SUPPLIER t2 ON t1.GYS_USER_ID = t2.SUPPLIER_ID
+	LEFT JOIN USER t3 ON t2.SUPPLIER_ID = t3.USER_ID
+	LEFT JOIN USER_MAIL t4 ON t3.USER_ID = t4.user_id
+	WHERE
+		1=1
+	<if test="_parameter!=''">
+		and t1.GS_USER_ID = #{param1}
+	</if>
+  </select>
+  
+  <select id="getProjectSuppliers" parameterType="java.lang.String" resultType="supplierMng.vo.SuppliersRetuenVO">
+  	SELECT
+		t1.APPLY_STATE AS applyState ,
+		t2.SUPPLIER_ID AS supplier_ID ,
+		t2.SUPPLIER_NAME AS supplier_Name ,
+		t2.SUPPLIER_STATE AS supplier_State ,
+		t2.SUPPLIER_DESC AS supplier_Desc ,
+		t3.USER_NAME AS user_name ,
+		t3.PHONE_NUM AS user_phone ,
+		t4.mail_address AS user_email
+	FROM
+		XM_GYS t1
+	LEFT JOIN SUPPLIER t2 ON t1.GYS_USER_ID = t2.SUPPLIER_ID
+	LEFT JOIN USER t3 ON t2.SUPPLIER_ID = t3.USER_ID
+	LEFT JOIN USER_MAIL t4 ON t3.USER_ID = t4.user_id
+	WHERE t1.XM_USER_ID = #{param1}
+  </select>
+  
+  <select id="getCompanyNotOwnerSuppliers" parameterType="java.lang.String" resultType="supplierMng.vo.SuppliersRetuenVO">
+	SELECT
+		t2.SUPPLIER_ID AS supplier_ID ,
+		t2.SUPPLIER_NAME AS supplier_Name ,
+		t2.SUPPLIER_STATE AS supplier_State ,
+		t2.SUPPLIER_DESC AS supplier_Desc ,
+		t3.USER_NAME AS user_name ,
+		t3.PHONE_NUM AS user_phone ,
+		t4.mail_address AS user_email
+	FROM
+		SUPPLIER t2
+	LEFT JOIN USER t3 ON t2.SUPPLIER_ID = t3.USER_ID
+	LEFT JOIN USER_MAIL t4 ON t3.USER_ID = t4.user_id
+	WHERE
+		t2.SUPPLIER_ID NOT IN(
+			SELECT
+				GYS_USER_ID
+			FROM
+				GS_GYS
+			WHERE
+				GS_USER_ID = #{param1}
+		)
+  </select>
+	
+	<select id="getProjectNotOwnerSuppliers"  parameterType="java.lang.String" resultType="supplierMng.vo.SuppliersRetuenVO">
+	SELECT
+		t2.SUPPLIER_ID AS supplier_ID ,
+		t2.SUPPLIER_NAME AS supplier_Name ,
+		t2.SUPPLIER_STATE AS supplier_State ,
+		t2.SUPPLIER_DESC AS supplier_Desc ,
+		t3.USER_NAME AS user_name ,
+		t3.PHONE_NUM AS user_phone ,
+		t4.mail_address AS user_email
+	FROM
+		SUPPLIER t2
+	LEFT JOIN USER t3 ON t2.SUPPLIER_ID = t3.USER_ID
+	LEFT JOIN USER_MAIL t4 ON t3.USER_ID = t4.user_id
+	WHERE
+		t2.SUPPLIER_ID IN(
+			SELECT
+				GYS_USER_ID
+			FROM
+				GS_GYS
+			WHERE
+				GS_USER_ID = #{param2}
+			AND
+				APPLY_STATE=2
+		)
+	AND
+		t2.SUPPLIER_ID NOT IN(
+			SELECT
+				GYS_USER_ID
+			FROM
+				XM_GYS
+			WHERE
+				XM_USER_ID = #{param1}
+		)
+	</select>
+	
+	<select id="getApprovalSupplierApplyFromGS" parameterType="java.lang.String" resultType="supplierMng.vo.CompanySupplierApplyReturnVo">
+		SELECT
+			t4.GS_NAME AS company_name ,
+			t4.GS_ID AS company_id ,
+			t4.GS_DESC AS company_desc ,
+			t2.USER_NAME AS user_name ,
+			t2.PHONE_NUM AS user_phone ,
+			t3.mail_address AS user_email ,
+			t1.APPLY_STATE AS apply_state
+		FROM
+			GS_GYS t1
+		LEFT JOIN COMPANY t4 ON t1.GS_USER_ID = t4.GS_ID
+		LEFT JOIN USER t2 ON t1.GS_USER_ID = t2.USER_ID
+		LEFT JOIN USER_MAIL t3 ON t2.USER_ID = t3.user_id
+		WHERE
+			t1.GYS_USER_ID = #{param1}
+	</select>
+	
+	<select id="getapprovalSupplierApplyFromXM" parameterType="java.lang.String" resultType="supplierMng.vo.ProjectSupplierApplyReturnVo">
+		SELECT
+			t4.PROJECT_NAME AS project_name ,
+			t4.PROJECT_ID AS project_id ,
+			t4.PROJECT_DETAIL AS project_desc ,
+			t2.USER_NAME AS user_name ,
+			t2.PHONE_NUM AS user_phone ,
+			t3.mail_address AS user_email ,
+			t1.APPLY_STATE AS apply_state
+		FROM
+			XM_GYS t1
+		LEFT JOIN PROJECT t4 ON t1.XM_USER_ID = t4.PROJECT_ID
+		LEFT JOIN USER t2 ON t1.XM_USER_ID = t2.USER_ID
+		LEFT JOIN USER_MAIL t3 ON t2.USER_ID = t3.user_id
+		WHERE
+			t1.GYS_USER_ID = #{param1}
+	</select>
+  
+</mapper>

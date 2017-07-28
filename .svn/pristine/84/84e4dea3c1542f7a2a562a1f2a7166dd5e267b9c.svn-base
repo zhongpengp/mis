@@ -1,0 +1,107 @@
+package common.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import common.service.ProjectService;
+import common.vo.CompanyProjectsQueryVO;
+import common.vo.Project;
+import common.vo.ProjectDetailReturnVO;
+import common.vo.RepairMachineVO;
+import common.vo.UnCheckMachineVO;
+import supplierMng.vo.SuppliersRetuenVO;
+
+@Controller
+@RequestMapping("/projectController")
+public class ProjectController {
+
+	@Autowired
+	private ProjectService projectService;
+
+	@ResponseBody
+	@RequestMapping("getCompanyProjects")
+	public List<Project> getCompanyProjects(CompanyProjectsQueryVO vo) {
+		return projectService.getCompanyProjects(vo);
+	}
+
+	@ResponseBody
+	@RequestMapping("getProjectDetailByID")
+	public ProjectDetailReturnVO getProjectDetailByID(String projectID) {
+		return projectService.getProjectDetailByID(projectID);
+	}
+	
+	@ResponseBody
+	@RequestMapping("getUncheckList")
+	public Map<String, Object>  getUncheckList(String projectId,String macName,String startTime,String endTime) {
+		List<UnCheckMachineVO> list = projectService.getUncheckList(projectId,macName,startTime,endTime);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("getCheckedList")
+	public Map<String, Object>  getCheckedList(String projectId,String macName,String startTime,String endTime) {
+		List<UnCheckMachineVO> list = projectService.getCheckedList(projectId, macName, startTime, endTime);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("getProjectSuppliers")
+	public List<SuppliersRetuenVO> getProjectSuppliers(String projectID) {
+		return projectService.getProjectSuppliers(projectID);
+	}
+	
+	@ResponseBody
+	@RequestMapping("inserCheckMachine")
+	public String inserCheckMachine(UnCheckMachineVO vo){
+		try{
+			projectService.inserCheckMachine(vo);
+		}catch(Exception e){
+			return "error";
+		}
+		return "success";
+	}
+	
+	@ResponseBody
+	@RequestMapping("getUnRepairList")
+	public Map<String, Object>  getUnRepairList(String projectId,String macName) {
+		List<RepairMachineVO> list = projectService.getUnRepairList(projectId, macName);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("getRepairedList")
+	public Map<String, Object>  getRepairedList(String projectId,String macName) {
+		List<RepairMachineVO> list = projectService.getRepairedList(projectId, macName);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("data", list);
+		map.put("total", list.size());
+		return map;
+	}
+	
+	@ResponseBody
+	@RequestMapping("inserRepairMachine")
+	public String inserRepairMachine(RepairMachineVO vo){
+		try{
+			projectService.inserRepairMachine(vo);
+		}catch(Exception e){
+			return "error";
+		}
+		return "success";
+	}
+	
+}
