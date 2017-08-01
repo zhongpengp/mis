@@ -493,4 +493,127 @@
 		#{list}
 	</foreach>
   </delete>
+  
+  <update id="machineToRepareOrXianzhi">
+  	UPDATE PROJECT_INSTRUMENT_INFO SET MACHINE_STATE=#{param2}
+  	WHERE ID IN 
+  	<foreach collection="param1" item="param1" index="index" open="("
+		close=")" separator=",">
+		#{param1}
+	</foreach>
+  </update>
+  
+  <select id="getSendOutProjectMachineInfo_gys" parameterType="java.lang.String" resultType="baseMachineMng.vo.SendOutProjectMachineInfo">
+  	SELECT 
+		T1.PROJECT_ID AS projectID,
+		T3.PROJECT_NAME AS projectName,
+		T1.GYX_ID AS supplierID,
+		T2.SUPPLIER_NAME AS supplierName,
+		T4.GS_ID AS companyID,
+		T4.GS_NAME AS companyName,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 0 THEN
+						1
+					ELSE
+						0
+					END
+				) AS hasSendInNum ,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 4 THEN
+						1
+					ELSE
+						0
+					END
+				) AS waitSendOutNum ,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 5 THEN
+						1
+					ELSE
+						0
+					END
+				) AS hasSendOutNum
+	
+	
+	FROM PROJECT_INSTRUMENT_INFO T1
+	LEFT JOIN SUPPLIER T2
+	ON T1.GYX_ID = T2.SUPPLIER_ID
+	LEFT JOIN PROJECT T3
+	ON T1.PROJECT_ID = T3.PROJECT_ID
+	LEFT JOIN COMPANY T4
+	ON T3.COMPANY_ID = T4.GS_ID
+	WHERE T1.GYX_ID=#{param1}
+	GROUP BY T1.PROJECT_ID
+  </select>
+  
+    <select id="getProjectMachineInfo_gs" parameterType="java.lang.String" resultType="baseMachineMng.vo.SendOutProjectMachineInfo_gs">
+SELECT 
+		T1.PROJECT_ID AS projectID,
+		T3.PROJECT_NAME AS projectName,
+		T1.GYX_ID AS supplierID,
+		T2.SUPPLIER_NAME AS supplierName,
+		T4.GS_ID AS companyID,
+		T4.GS_NAME AS companyName,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 0 THEN
+						1
+					ELSE
+						0
+					END
+				) AS hasSendInNum ,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 4 THEN
+						1
+					ELSE
+						0
+					END
+				) AS waitSendOutNum ,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 5 THEN
+						1
+					ELSE
+						0
+					END
+				) AS hasSendOutNum,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 1 THEN
+						1
+					ELSE
+						0
+					END
+				) AS unusedNum,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 2 THEN
+						1
+					ELSE
+						0
+					END
+				) AS waitRepaireNum,
+		SUM(
+					CASE
+					WHEN T1.MACHINE_STATE = 3 THEN
+						1
+					ELSE
+						0
+					END
+				) AS scarpNum
+	
+	
+	FROM PROJECT_INSTRUMENT_INFO T1
+	LEFT JOIN SUPPLIER T2
+	ON T1.GYX_ID = T2.SUPPLIER_ID
+	LEFT JOIN PROJECT T3
+	ON T1.PROJECT_ID = T3.PROJECT_ID
+	LEFT JOIN COMPANY T4
+	ON T3.COMPANY_ID = T4.GS_ID
+	WHERE T4.GS_ID=#{param1}
+	GROUP BY T1.PROJECT_ID,T1.GYX_ID
+  </select>
 </mapper>

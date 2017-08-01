@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="log.persistent.ApplyMapper" >
+	<resultMap type="common.vo.registerUserVO" id="registerUserVO">
+		<result column="APPLY_ID" property="applyID" jdbcType="VARCHAR"/>
+		<result column="APPLIER_NAME" property="applyuser" jdbcType="VARCHAR"/>
+		<result column="IDCARD_NUM" property="applyuserID" jdbcType="VARCHAR"/>
+		<result column="PHONE_NUM" property="applyphone" jdbcType="VARCHAR"/>
+		<result column="PROJECT_NAME" property="applyproject" jdbcType="VARCHAR"/>
+		<result column="PROJECT_DETAIL" property="projectDESC" jdbcType="VARCHAR"/>
+		<result column="APPLY_TIME" property="applyTime" jdbcType="VARCHAR"/>
+		<result column="APPLY_STATUE" property="applyStatus" jdbcType="VARCHAR"/>
+		<result column="APPLY_IP" property="applyIP" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_DETAIL" property="approveBody" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_DATE" property="approveDate" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_USERID" property="approveUser" jdbcType="VARCHAR"/>
+		<result column="EMAIL" property="applymail" jdbcType="VARCHAR"/>
+		<result column="PROJECT_TYPE" property="projectType" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<insert id="saveApply">
+		insert into REGISTER_APPLY 
+		(APPLY_ID,APPLIER_NAME,IDCARD_NUM,PHONE_NUM,PROJECT_NAME,PROJECT_DETAIL,
+		APPLY_TIME,APPLY_STATUE,APPLY_IP,APPROVAL_DETAIL,APPROVAL_DATE,APPROVAL_USERID,EMAIL,PROJECT_TYPE)
+		values
+		(#{applyID,jdbcType=VARCHAR},#{applyuser,jdbcType=VARCHAR},
+		#{applyuserID,jdbcType=VARCHAR},#{applyphone,jdbcType=VARCHAR},
+		#{applyproject,jdbcType=VARCHAR},#{projectDESC,jdbcType=VARCHAR},
+		date_format(SYSDATE(),'%Y-%m-%d'),'0',
+		#{applyIP,jdbcType=VARCHAR},#{approveBody,jdbcType=VARCHAR},
+		#{approveDate,jdbcType=VARCHAR},#{approveUser,jdbcType=VARCHAR},#{applymail,jdbcType=VARCHAR},
+		#{projectType,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="listApply" parameterType="java.util.Map" resultMap="registerUserVO">
+		select * from REGISTER_APPLY where 1=1
+		 <if test="approveStatus != null and approveStatus != ''">
+			and APPLY_STATUE = #{approveStatus}  
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and  APPLY_TIME &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and  APPLY_TIME &lt;= #{endTime} 
+		</if>  
+		order by APPLY_STATUE asc ,APPLY_TIME desc
+ 	</select>
+ 	
+ 	<insert id="saveUser" parameterType="java.util.Map">
+ 		insert into USER 
+ 		(USER_ID,APPLY_ID,USER_NAME,LOGIN_NAME,LOGIN_PASSWORD,USER_STATUE,USER_TYPE,PHONE_NUM)
+ 		values
+ 		(#{userID},#{applyID},#{userName},#{loginName},#{password},#{userStatus},#{userType},#{userPhone})
+ 	</insert>
+ 	
+ 	<update id="applyUpdate" parameterType="java.util.Map">
+ 		update REGISTER_APPLY set 
+ 			APPLY_STATUE = #{applyStatus}, APPROVAL_DETAIL=#{approveBody},
+ 			APPROVAL_DATE = date_format(SYSDATE(),'%Y-%m-%d'),
+ 			APPROVAL_USERID = #{approveID}
+ 		where APPLY_ID = #{applyID}
+ 	</update>
+ 	
+ 	<insert id="saveProject" parameterType="java.util.Map">
+ 		insert into PROJECT 
+ 		(PROJECT_ID,PROJECT_NAME,PROJECT_DETAIL,PROJECT_STATUE,PROJECT_TYPE,PROJECT_STEP)
+ 		values
+ 		(#{projectID},#{projectName},#{projectDesc},#{projectStatus},#{projectType},#{projectStep})
+ 	</insert>
+ 	
+ 	<resultMap type="common.vo.MailVO" id="mailVO">
+		<result column="MAIL_ADDRESS" property="address" jdbcType="VARCHAR"/>
+		<result column="ACCREDIT_CODE" property="code" jdbcType="VARCHAR"/>
+		<result column="SMTP_PORT" property="port" jdbcType="INTEGER"/>
+		<result column="ID" property="ID" jdbcType="INTEGER"/>
+	</resultMap>
+	
+ 	<select id="getMail" resultMap="mailVO">
+ 		select * from MAIL
+ 	</select>
+ 	
+ 	<select id="validate" parameterType="java.lang.String" resultType="java.lang.Integer" >
+ 		select count(1) from USER where LOGIN_NAME = #{name}
+ 	</select>
+ 	
+ 	<select id="validateProject" parameterType="java.lang.String" resultType="java.lang.Integer" >
+ 		select count(1) from PROJECT where PROJECT_NAME = #{name}
+ 	</select>
+ 	
+ 	<select id="validateGys_name" parameterType="java.lang.String" resultType="java.lang.Integer" >
+ 		select count(*) from REGISTER_APPLY_GYS where APPLY_NAME = #{name}
+ 	</select>
+ 	
+ 	<select id="validateGS_Name" parameterType="java.lang.String" resultType="java.lang.Integer" >
+ 		select count(*) from REGISTER_APPLY_GS where APPLY_GS_NAME = #{name}
+ 	</select>
+ 	
+ 	<select id="getUserInfo" parameterType="java.lang.String" resultType="java.util.Map">
+ 		SELECT
+				t.LOGIN_NAME,
+				t.LOGIN_PASSWORD,
+				t.USER_NAME,
+				t.PHONE_NUM,
+				t.BIRTHDAY,
+				t.SEX,
+				t.USER_STATUE,
+				t.USER_TYPE
+			FROM  USER t WHERE t.USER_ID=#{userID}		
+ 	</select>
+ 	
+ 	<select id="getProjectInfo" parameterType="java.lang.String" resultType="java.util.Map">
+ 		SELECT
+			t.*, t1.USER_NAME,
+			t1.PHONE_NUM,
+			t2.APPLY_TIME
+		FROM
+			PROJECT t,
+			USER t1,
+			REGISTER_APPLY t2
+		WHERE
+			t.PROJECT_ID = t1.USER_ID
+		AND t1.APPLY_ID = t2.APPLY_ID
+		AND t.PROJECT_ID = #{projectID}		
+ 	</select>
+ 	
+ 	<update id="updateProject" parameterType="java.util.Map">
+ 		update  PROJECT set 
+ 			PROJECT_DETAIL = #{projectDESC},
+ 			PROJECT_STEP = #{step},
+ 			PROJECT_STATUE = #{status}
+ 		where PROJECT_ID = #{projectID}	
+ 	</update>
+ 	
+ 	<select id="getApplyUserInfo" parameterType="java.lang.String" resultType="java.util.Map" >
+ 		SELECT PROJECT_NAME FROM PROJECT WHERE PROJECT_ID = #{userID}
+ 	</select>
+ 	
+ 	<insert id="newMachineApply" parameterType="java.util.Map">
+ 		insert into PROJECT_NEWM_APPLY 
+ 		(APPLY_ID,PROJECT_ID,APPLY_USER,APPLY_BODY,APPLY_REASON,REMARK,APPLY_DATE,APPLY_STATE) 
+ 			values
+ 		(#{applyID},#{projectID},#{applyUser},#{applyBody},#{applyReason},#{remark},#{applyDate},#{applyState})	 
+ 	</insert>
+ 	
+ 	<resultMap type="common.vo.newMachineApplyVO" id="newMachineApplyVO">
+		<result column="APPLY_ID" property="applyID" jdbcType="VARCHAR"/>
+		<result column="PROJECT_NAME" property="projectId" jdbcType="VARCHAR"/>
+		<result column="APPLY_USER" property="applyUser" jdbcType="VARCHAR"/>
+		<result column="APPLY_REASON" property="applyReason" jdbcType="VARCHAR"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+		<result column="APPLY_BODY" property="applyBody" jdbcType="VARCHAR"/>
+		<result column="APPLY_STATE" property="applyState" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_DETAIL" property="approvalDetail" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_DATE" property="approvalDate" jdbcType="VARCHAR"/>
+		<result column="APPROVAL_USERID" property="approvalUserID" jdbcType="VARCHAR"/>
+		<result column="APPLY_DATE" property="applyDate" jdbcType="VARCHAR"/>
+		<result column="APPLY_FILE" property="applyFile" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+ 	<select id="listNewMachineApply" parameterType="java.util.Map" resultMap="newMachineApplyVO" >
+ 		SELECT
+			t.APPLY_BODY,
+			t.APPLY_DATE,
+			t.APPLY_FILE,
+			t.APPLY_ID,
+			t.APPLY_REASON,
+			t.APPLY_STATE,
+			t.APPROVAL_DATE,
+			t.APPROVAL_DETAIL,
+			t.APPROVAL_USERID,
+			t.REMARK,
+		    t.APPLY_USER,
+		    (SELECT PROJECT_NAME FROM PROJECT WHERE  PROJECT_ID = #{userID} ) AS PROJECT_NAME
+		FROM
+			PROJECT_NEWM_APPLY t
+		WHERE
+		  t.PROJECT_ID = #{userID}
+		<if test="startTime != null and startTime != ''">
+			and  t.APPLY_DATE &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and  t.APPLY_DATE &lt;= #{endTime} 
+		</if>
+		<if test="body != null and body != ''">
+			and  t.APPLY_BODY like CONCAT('%',#{body},'%')  
+		</if>
+ 	</select>
+ 	
+ 	<update id="UpdateMachineApply" parameterType="java.util.Map">
+ 		UPDATE PROJECT_NEWM_APPLY
+			SET APPLY_FILE = #{filePath}
+		WHERE
+			APPLY_ID = #{applyID}
+ 	</update>
+ 	
+ 	<resultMap type="common.vo.applyMachineInfoVO" id="applyMachineInfoVO">
+ 		<result column="ID" property="id" jdbcType="VARCHAR"/>
+		<result column="APPLY_ID" property="applyID" jdbcType="VARCHAR"/>
+		<result column="MACHINE_NAME" property="machineName" jdbcType="VARCHAR"/>
+		<result column="MACHINE_TYPE" property="machineType" jdbcType="VARCHAR"/>
+		<result column="MACHINE_SIZE" property="machineSize" jdbcType="VARCHAR"/>
+		<result column="MACHINE_NUM" property="machineNum" jdbcType="VARCHAR"/>
+		<result column="UNIT" property="unit" jdbcType="VARCHAR"/>
+		<result column="PRODUCTER" property="producter" jdbcType="VARCHAR"/>
+		<result column="APPLY_REASON" property="applyReason" jdbcType="VARCHAR"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+ 	<select id="listApplyDetail" parameterType="java.lang.String" resultMap= "applyMachineInfoVO">
+ 		SELECT * FROM APPLY_MACHINE_INFO WHERE APPLY_ID = #{applyID}
+ 	</select>
+ 	
+ 	<insert id="addApplyMachineInfo" parameterType="common.vo.applyMachineInfoVO">
+ 		insert into APPLY_MACHINE_INFO 
+ 		(ID,APPLY_ID,MACHINE_NAME,MACHINE_TYPE,MACHINE_SIZE,MACHINE_NUM,UNIT,PRODUCTER,APPLY_REASON,REMARK) 
+ 			values 
+ 	    (#{id},#{applyID},#{machineName},#{machineType},#{machineSize},#{machineNum},#{unit},#{producter},#{applyReason},#{remark})
+ 	</insert>
+ 	
+ 	<select id="listNewMachineApproval" parameterType="java.util.Map" resultMap="newMachineApplyVO">
+ 		SELECT
+			t.APPLY_BODY,
+			t.APPLY_DATE,
+			t.APPLY_FILE,
+			t.APPLY_ID,
+			t.APPLY_REASON,
+			t.APPLY_STATE,
+			t.APPROVAL_DATE,
+			t.APPROVAL_DETAIL,
+			t.APPROVAL_USERID,
+			t.REMARK,
+		    t.APPLY_USER,
+		    (SELECT PROJECT_NAME FROM PROJECT WHERE  PROJECT_ID = t.PROJECT_ID ) AS PROJECT_NAME
+		FROM 
+			PROJECT_NEWM_APPLY t
+		WHERE 1=1
+		<choose> 
+			<when test="projectID != null and projectID != ''">
+				and t.PROJECT_ID = #{projectID}
+			</when>
+			<otherwise>
+				and t.PROJECT_ID IN (SELECT PROJECT_ID FROM PROJECT WHERE COMPANY_ID=#{userID})
+			</otherwise>
+		</choose>
+		<if test="state != null and state != ''">
+			and  t.APPLY_STATE = #{state}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and  t.APPLY_DATE &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and  t.APPLY_DATE &lt;= #{endTime} 
+		</if>
+		<if test="body != null and body != ''">
+			and  t.APPLY_BODY like CONCAT('%',#{body},'%')  
+		</if>
+		ORDER BY t.APPLY_STATE ASC
+ 	</select>
+</mapper>

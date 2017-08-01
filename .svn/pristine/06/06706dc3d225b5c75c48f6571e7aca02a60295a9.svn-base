@@ -1,0 +1,375 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="../common/header_fileUpload.jsp"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>基础设备信息管理</title>
+<script type="text/javascript">
+var baseMachineTableSelectCourseArrangeID;
+var baseMachineTableSelectCourseName;
+var baseMachineListModalTableSelectStudentID;
+$(function(){
+	$("#form_4").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+	$("#form_5").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+	$("#form_6").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+	$("#form_7").datetimepicker({format: 'yyyy-mm-dd', autoclose:true,todayBtn:"linked",todayHighlight:true,language:'zh-CN',minView:2});
+	initProjectMachine_Table();
+	
+	
+	
+	$("#form_submitBtn").on("click",function(){
+		if($("#form_1").val()==""||$("#form_2").val()==""||$("#form_3").val()==""||$("#form_4").val()==""||$("#form_5").val()==""||$("#form_6").val()==""||$("#form_7").val()==""){
+			alert_warning("设备进场信息录入","请将所有信息填写完整！")
+		}else{
+			$.ajax({
+				url:'<%=path%>/projectMachineImportController/saveMachineSendInInfo',
+				data:$("#form1").serialize(),
+				success:function(data){
+					alert_success("设备进场信息录入","保存成功！请及时下载验收单模版并填写！"+'<br/><a class=""href="<%=path%>/resource/维修单.xls" download="">(验收单模版下载)</a>');
+					$("#viewMachineDetailModal").modal('hide');
+					$("#ProjectMachine_Table").bootstrapTable('refresh',{silent:true});
+				},
+				error:function(){
+					alert_danger("设备进场信息录入","保存失败，请检查数据后重试！")
+				}
+			});
+		}
+	});
+});
+function machineToXianzhiBtn(){
+	var selects = $("#ProjectMachine_Table").bootstrapTable('getSelections');
+	if(selects.length==0){
+		alert_warning("设备闲置处理","请先选择要闲置的设备！")
+	}else{
+		var success = true;
+		var machineIDs = '';
+		$(selects).each(function(index,value){
+			if(value.machineState!=0){
+				success = false;
+			}
+			if(index==selects.length-1){
+				machineIDs+=value.id;
+			}else{
+				machineIDs+=value.id+',';
+			}
+		});
+		if(!success){
+			alert_danger("设备闲置处理","只能选择使用中的设备！");
+		}else{
+			$.ajax({
+				url:'<%=path%>/projectMachineImportController/machineToRepareOrXianzhi',
+				data:{
+					machineIDs:machineIDs,
+					state:"1"
+				},
+				success:function(data){
+					alert_success("设备闲置","闲置处理成功！")
+					$("#ProjectMachine_Table").bootstrapTable('refresh',{silent:true});
+				},
+				error:function(){
+					alert_danger("设备闲置","处理失败，请稍后重试！")
+				}
+			});
+		}
+	}
+}
+
+function machineToRepareBtn(){
+	var selects = $("#ProjectMachine_Table").bootstrapTable('getSelections');
+	if(selects.length==0){
+		alert_warning("设备报修","请先选择要报修的设备！")
+	}else{
+		var success = true;
+		var machineIDs = "";
+		$(selects).each(function(index,value){
+			if(value.machineState!=0){
+				success = false;
+			}
+			if(index==selects.length-1){
+				machineIDs+=value.id;
+			}else{
+				machineIDs+=value.id+',';
+			}
+		});
+		if(!success){
+			alert_danger("设备报修","只能选择使用中的设备！");
+		}else{
+			$.ajax({
+				url:'<%=path%>/projectMachineImportController/machineToRepareOrXianzhi',
+				data:{
+					machineIDs:machineIDs,
+					state:"2"
+				},
+				success:function(data){
+					alert_success("设备报修","报修成功！请及时下载维修单模版并填写！"+'<br/><a class=""href="<%=path%>/resource/维修单.xls" download="">(维修单模版下载)</a>');
+					$("#ProjectMachine_Table").bootstrapTable('refresh',{silent:true});
+				},
+				error:function(){
+					alert_danger("设备报修","处理失败，请稍后重试！")
+				}
+			});
+		}
+	}
+}
+function toInputMachineSendInInfo(){
+	var selects = $("#ProjectMachine_Table").bootstrapTable('getSelections');
+	if(selects.length==0){
+		alert_warning("设备进场信息录入","请先选择要录入进场信息的设备！")
+	}else if(selects.length!=1){
+		alert_warning("设备进场信息录入","只能选择一个设备进行录入！")
+	}else{
+		if(selects[0].machineState!=5){
+			alert_danger("设备进场信息录入","只能选择待收货设备录入！");
+		}else{
+			$("#viewMachineDetailModal_Title").text(selects[0].machineName+"验收信息录入");
+			var machineID = selects[0].id;
+			$("#form1")[0].reset();
+			$("#id1").val(machineID);
+			$("#viewMachineDetailModal").modal('show');
+		}
+	}
+}
+function initProjectMachine_Table(){
+	$("#ProjectMachine_Table").bootstrapTable("destroy");
+	$("#ProjectMachine_Table").bootstrapTable({
+		url: '<%=path%>/projectMachineImportController/getProjectMachineInfo_xm',
+		method: 'get',
+        //toolbar: '#toolbar',    //工具按钮用哪个容器
+        striped: true,      //是否显示行间隔色
+        cache: false,      //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        pagination: true,     //是否显示分页（*）
+        maintainSelected:true,//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        //sortable: false,      //是否启用排序
+        //sortOrder: "asc",     //排序方式
+        pageNumber:1,      //初始化加载第一页，默认第一页
+        pageSize:10,
+        pageList: [5, 10, 15, 20,25,30,40,50,100],   //可供选择的每页的行数（*）
+        maintainSelected:true, 	//设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        queryParamsType:'', //默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
+                            // 设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber
+        //queryParams: queryParams,//前端调用服务时，会默认传递上边提到的参数，如果需要添加自定义参数，可以自定义一个函数返回请求参数
+        sidePagination: "client",   //分页方式：client客户端分页，server服务端分页（*）
+        search: true,      //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+        ////strictSearch: true,
+        //showColumns: true,     //是否显示所有的列
+        //showRefresh: true,     //是否显示刷新按钮
+        clickToSelect: true,    //是否启用点击选中行
+        showExport:true,
+        showFilter:true,
+        filterControl:true,
+        filterShowClear:true,
+        exportTypes:['excel', 'doc',  'pdf', 'png', 'xml', 'csv', 'txt', 'sql','json'],
+        //queryParams:$("#projectList_gs_searchForm").serialize(),
+		queryParams : function(data) {
+		    data.projectID='<%=userID %>';
+			return data;
+		},
+		onLoadSuccess:function(data){
+		},
+		columns : [
+			/*
+			private String id;
+    private String gyxId;
+    private String projectId;
+    private String machineName;
+    private String machineType;
+    private String machineSize;
+    private String rangeJingdu;
+    private String producerOrd;
+    private String machineState;
+    private String unit;
+    private String producer;
+    private String oldNew;
+    private Date sendDate;
+    private Date importDate;
+    private Date installDate;
+    private Date checkDate;
+    private String checkPeriod;
+    private Date baozhiqi;
+    private Integer repairNum;
+    private Double unitPrice;
+    private String machineClassify;
+    private String remark;
+			*/
+			{field : 'check_box', checkbox : true},
+			{field : 'machineState',title:'状态',visible : true,
+				formatter:function(value,row,index){
+					if(value==0){//0在用；1不再用，2待维修，3报废，
+						return '<font color="green">在用</font>';
+					}else if(value==4){
+						return '<font color="orange">待发货</font>';
+					}else if(value==5){
+						return '<font color="blue">待收货</font>';
+					}else if(value==1){
+						return '<font color="">闲置</font>';
+					}else if(value==2){
+						return '<font color="red">待维修</font>';
+					}else if(value==3){
+						return '<font color="red">报废</font>';
+					}
+				}
+			},
+			{field : 'machineClassify',title:'类型',visible : true},
+			{field : 'machineName',title:'名称',visible : true},
+			{field : 'producerOrd',title:'出厂编号',visible : true},
+			{field : 'machineType',title:'型号',visible : true},
+			{field : 'machineSize',title:'规格',visible : true},
+			{field : 'rangeJingdu',title:'度量精度',visible : true},
+			{field : 'oldNew',title:'新旧程度',visible : true},
+			{field : 'unit',title:'单位',visible : true},
+			{field : 'unitPrice',title:'价格',visible : true},
+			{field : 'producer',title:'生产厂家',visible : true},
+			{field : 'importDate',title:'验收日期',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+				return getSmpFormatDateByLong(value,false);
+			}},
+			{field : 'installDate',title:'安装日期',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+				return getSmpFormatDateByLong(value,false);
+			}},
+			{field : 'checkDate',title:'检定日期',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+				return getSmpFormatDateByLong(value,false);
+			}},
+			{field : 'checkPeriod',title:'检定周期',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+				return value+"个月";
+			}},
+			{field : 'baozhiqi',title:'保质期到',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+				return getSmpFormatDateByLong(value,false);
+			}},
+			{field : 'producer',title:'生产厂家',visible : true},
+			{field : 'repairNum',title:'已维修',visible : true,formatter:function(value,row,index){
+				if(value!=null)
+					return value+"次";
+				}},
+			{field : 'remark',title:'备注',visible : false}
+	]
+	});
+}
+</script>
+</head>
+<body>
+	<div class="container" style="margin: 0 0 0 0 ;width: 100%;">
+		<div class="page-content-wrapper">
+			<div class="page-content-wrapper">
+				<div id=page_title>
+					<ul class="breadcrumb" style="margin-bottom:0;">   
+						<li>    设备管理</li>  
+						<li class="active">项目设备信息</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 3px">
+			<div class="col-sm-12" style="width: 100%">
+				<div id="ProjectMachine_Table_Toolbar" >
+					<button type="button" class="btn btn-primary" onClick="toInputMachineSendInInfo()">验收信息录入</button>
+					<button type="button" class="btn btn-danger" onClick="machineToRepareBtn()">设备报修</button>
+					<button type="button" class="btn btn-warning" onClick="machineToXianzhiBtn()">设备闲置处理</button>
+					<a class="btn btn-info"href="<%=path%>/resource/验收单.xls" download="">验收单模版下载</a>
+					<a class="btn btn-info"href="<%=path%>/resource/维修单.xls" download="">维修单模版下载</a>
+					<a class="btn btn-info"href="<%=path%>/resource/检定确认表.xls" download="">检定确认表下载</a>
+				</div>
+				<table id="ProjectMachine_Table" class="table table-condensed" data-toolbar="#ProjectMachine_Table_Toolbar"data-toggle="table" data-striped="true" data-search="true"  data-show-columns="true">
+					<thead style="background-color: #87CEFF"></thead>
+				</table>
+			</div>
+		</div>
+					<!-- 模态框（Modal） -->
+		<div class="modal fade" id="viewMachineDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+		    <div class="modal-dialog" style="width: 80%">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                <h4 class="modal-title" id="viewMachineDetailModal_Title"></h4>
+		            </div>
+		            <div class="modal-body" id="viewMachineDetailModalBody">
+		            	<form id="form1" class="form-horizontal" role="form">
+		            		
+		            		
+							<div class="form-group">
+								<label for="gouzhiriqi" class="col-sm-2 control-label">出场编号</label>
+							    <div class="col-sm-4">
+							    <input type="text" name="id1" id="id1" style="display: none">
+								      <input  type="text" id="form_1"  class="form-control form_datetime" name="form_1">
+								    </div>
+							</div>
+							<div class="form-group">
+			      				<label for="xinjiuchengdu" class="col-sm-2 control-label">新旧程度</label>
+							    <div class="col-md-4">
+									<label class="checkbox-inline">
+								    	<input type="radio" name="form_2" id="form_2" value="全新" checked>全新
+								  	</label>
+								  	<label class="checkbox-inline">
+								    	<input type="radio" name="form_2" id="form_2" value="半新">半新
+								  	</label>
+								  	<label class="checkbox-inline">
+								    	<input type="radio" name="form_2" id="form_2" value="旧">旧
+								  	</label>
+							  	</div>
+							  	 <label for="gouzhiriqi" class="col-sm-3 control-label">检定周期（个月）</label>
+							    <div class="col-sm-3">
+							    	<select class="form-control" id="form_3" name="form_3">
+								      <option value="1">1</option>
+								      <option value="2">2</option>
+								      <option value="3">3</option>
+								      <option value="4">4</option>
+								      <option value="5">5</option>
+								      <option value="6">6</option>
+								      <option value="7">7</option>
+								      <option value="8">8</option>
+								      <option value="9">9</option>
+								      <option value="10">10</option>
+								      <option value="11">11</option>
+								      <option value="12">12</option>
+								      <option value="13">13</option>
+								      <option value="14">14</option>
+								      <option value="15">15</option>
+								      <option value="16">16</option>
+								      <option value="17">17</option>
+								      <option value="18">18</option>
+								      <option value="19">19</option>
+								      <option value="20">20</option>
+								      <option value="21">21</option>
+								      <option value="22">22</option>
+								      <option value="23">23</option>
+								      <option value="24">24</option>
+								    </select>
+							    </div>
+			      			</div>
+			      			<div class="form-group">
+			      				 <label for="gouzhiriqi" class="col-sm-2 control-label">验收日期</label>
+							    <div class="col-sm-4">
+								      <input placeholder="" type="text" id="form_4"  class="form-control form_datetime" name="form_4" readonly>
+								    </div> 
+								    <label for="gouzhiriqi" class="col-sm-2 control-label">安装日期</label>
+							    <div class="col-sm-4">
+								      <input placeholder="" type="text" id="form_5"  class="form-control form_datetime" name="form_5" readonly>
+								    </div>  
+			      			</div>
+			      			<div class="form-group">
+			      				 <label for="gouzhiriqi" class="col-sm-2 control-label">检定日期</label>
+							    <div class="col-sm-4">
+								      <input placeholder="" type="text" id="form_6"  class="form-control form_datetime" name="form_6" readonly>
+								    </div> 
+								    <label for="gouzhiriqi" class="col-sm-2 control-label">保质期到</label>
+							    <div class="col-sm-4">
+								      <input placeholder="" type="text" id="form_7"  class="form-control form_datetime" name="form_7" readonly>
+								    </div>  
+			      			</div>
+						</form>
+					</div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		                <button type="button" class="btn btn-success" id="form_submitBtn">保存</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal -->
+		</div>
+	</div>
+</body>
+</html>

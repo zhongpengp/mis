@@ -1,0 +1,287 @@
+package common.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.log4j.SimpleLayout;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import common.persistent.CompanyMapper;
+import common.persistent.RegisterApplyGSMapper;
+import common.persistent.RegisterApplyGYSMapper;
+import common.persistent.RegisterApplyXMMapper;
+import common.persistent.UserVOMapper;
+import common.vo.Company;
+import common.vo.CompanyExample;
+import common.vo.MailVO;
+import common.vo.RegisterApplyGS;
+import common.vo.RegisterApplyGYS;
+import common.vo.RegisterApplyXM;
+import common.vo.RegisterApplyXMExample;
+import common.vo.UserVO;
+import common.vo.applyMachineInfoVO;
+import common.vo.newMachineApplyVO;
+import common.vo.queryVO;
+import common.vo.registerUserVO;
+import log.persistent.ApplyMapper;
+import mail.service.MailUtil;
+import util.UUID_Util;
+
+@Service
+public class ApplyServiceImpl implements ApplyService {
+	@Autowired
+	private ApplyMapper applyMapper;
+	@Autowired
+	private UserVOMapper userMapper;
+	@Autowired
+	private RegisterApplyGYSMapper registerApplyGYSMapper;
+	@Autowired
+	private RegisterApplyGSMapper registerApplyGSMapper;
+	@Autowired
+	private RegisterApplyXMMapper registerApplyXMMapper;
+	@Autowired
+	private CompanyMapper companyMapper;
+
+	@Override
+	public void saveApply(registerUserVO vo) {
+		String id = UUID.randomUUID().toString().replaceAll("-", "");
+		vo.setApplyID(id);
+		applyMapper.saveApply(vo);
+	}
+
+	@Override
+	public List<registerUserVO> listApply(String startTime, String endTime, String approveStatus) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("startTime", startTime);
+		map.put("endTime", endTime);
+		map.put("approveStatus", approveStatus);
+		List<registerUserVO> list = applyMapper.listApply(map);
+		return list;
+	}
+
+	@Override
+	public void saveApprove(registerUserVO vo) {
+		// 查看审批状态
+		String status = vo.getApplyStatus();
+		if ("1".equals(status)) { // 通过审批
+			// 注册用户
+			Map<String, String> userMap = new HashMap<String, String>();
+			String userID = UUID.randomUUID().toString().replaceAll("-", "");
+			userMap.put("userID", userID);
+			userMap.put("applyID", vo.getApplyID());
+			userMap.put("userName", vo.getApplyuser());
+			userMap.put("loginName", vo.getApplyproject());
+			String ID = vo.getApplyuserID();
+			String password = ID.substring(ID.length() - 6);
+			userMap.put("password", password);
+			userMap.put("userStatus", "0");
+			userMap.put("userType", "2");
+			userMap.put("userPhone", vo.getApplyphone());
+			applyMapper.saveUser(userMap);
+			// 新增项目
+			Map<String, String> projectMap = new HashMap<String, String>();
+			projectMap.put("projectID", userID);
+			projectMap.put("projectName", vo.getApplyproject());
+			projectMap.put("projectDesc", vo.getProjectDESC());
+			projectMap.put("projectStatus", "0");
+			projectMap.put("projectType", vo.getProjectType());
+			projectMap.put("projectStep", "0");
+			applyMapper.saveProject(projectMap);
+		}
+		// 更新申请状态
+		Map<String, String> statusMap = new HashMap<String, String>();
+		statusMap.put("applyStatus", status);
+		statusMap.put("approveID", vo.getApproveUser());
+		statusMap.put("approveBody", vo.getApproveBody());
+		statusMap.put("applyID", vo.getApplyID());
+		applyMapper.applyUpdate(statusMap);
+		// 邮件通知结果
+		MailVO mail = applyMapper.getMail();
+		MailUtil.sendMessage(mail, vo);
+
+	}
+
+	@Override
+	public int validate(String name) {
+		return applyMapper.validate(name);
+	}
+
+	@Override
+	public Map<String, String> getUserInfo(String userID) {
+		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> data = applyMapper.getUserInfo(userID);
+		map.put("userName", data.get("LOGIN_NAME"));
+		map.put("password", data.get("LOGIN_PASSWORD"));
+		map.put("name", data.get("USER_NAME"));
+		map.put("phone", data.get("PHONE_NUM"));
+		map.put("sex", data.get("SEX"));
+		map.put("birth", data.get("BIRTHDAY"));
+		map.put("userType", data.get("USER_TYPE"));
+		map.put("userStatus", data.get("USER_STATUE"));
+		return map;
+	}
+
+	@Override
+	public int validateProject(String name) {
+
+		return applyMapper.validateProject(name);
+	}
+
+	@Override
+	public Map<String, String> getProjectInfo(String projectID) {
+		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> data = applyMapper.getProjectInfo(projectID);
+		map.put("projectName", data.get("PROJECT_NAME"));
+		map.put("name", data.get("USER_NAME"));
+		String status = data.get("PROJECT_STATUE");
+		if ("0".equals(status)) {
+			status = "未开始";
+		} else if ("1".equals(status)) {
+			status = "已取消";
+		} else if ("2".equals(status)) {
+			status = "进行中";
+		} else if ("3".equals(status)) {
+			status = "已完成";
+		} else if ("4".equals(status)) {
+			status = "已注销";
+		}
+		map.put("projectStatus", status);
+		map.put("applyTime", data.get("APPLY_TIME"));
+		map.put("phone", data.get("PHONE_NUM"));
+		map.put("projectType", data.get("PROJECT_TYPE"));
+		map.put("projectDESC", data.get("PROJECT_DETAIL"));
+		map.put("projectStep", data.get("PROJECT_STEP"));
+		return map;
+	}
+
+	@Override
+	public void saveUserInfo(UserVO vo) {
+		vo.setUserStatue("1");
+		userMapper.updateByPrimaryKeySelective(vo);
+	}
+
+	@Override
+	public void updateProject(String projectID, String projectDESC, String step) {
+		Map<String, String> map = new HashMap<String, String>();
+		String status = "2";
+		if ("9".equals(step)) {
+			status = "3";
+		}
+		map.put("projectID", projectID);
+		map.put("projectDESC", projectDESC);
+		map.put("step", step);
+		map.put("status", status);
+		applyMapper.updateProject(map);
+	}
+
+	@Override
+	public int validateGys_name(String name) {
+		return applyMapper.validateGys_name(name);
+	}
+
+	@Override
+	public void saveApply_gys(RegisterApplyGYS vo) {
+		registerApplyGYSMapper.insert(vo);
+	}
+
+	@Override
+	public int validateGS_Name(String name) {
+		return applyMapper.validateGS_Name(name);
+	}
+
+	@Override
+	public void register_gs(RegisterApplyGS vo) {
+		registerApplyGSMapper.insert(vo);
+	}
+
+	@Override
+	public List<RegisterApplyGS> listCompanyApply(String startTime, String endTime, String approveStatus) {
+		
+		return null;
+	}
+
+	@Override
+	public List<Company> initCompanySelectOption() {
+		CompanyExample example = new CompanyExample();
+		example.createCriteria().andGsStateEqualTo(1);
+		return companyMapper.selectByExample(example);
+	}
+
+	@Override
+	public int validateXM_name(String name) {
+		RegisterApplyXMExample example = new RegisterApplyXMExample();
+		example.createCriteria().andProjectNameEqualTo(name);
+		return  registerApplyXMMapper.countByExample(example);
+	}
+
+	@Override
+	public void register_xm(RegisterApplyXM vo) {
+		registerApplyXMMapper.insert(vo);
+	}
+
+	@Override
+	public void newMachineApply(newMachineApplyVO vo) {
+		Map<String,String> map = new HashMap<String, String>();
+		map.put("applyID", UUID_Util.getUUID());
+		map.put("applyDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		map.put("applyState", "0");
+		map.put("projectID", vo.getProjectId());
+		map.put("applyUser", vo.getApplyUser());
+		map.put("applyBody", vo.getApplyBody());
+		map.put("applyReason", vo.getApplyReason());
+		map.put("remark", vo.getRemark());
+		applyMapper.newMachineApply(map);
+	}
+
+	@Override
+	public Map<String, String> getApplyUserInfo(String userID) {
+		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> data = applyMapper.getApplyUserInfo(userID);
+		map.put("projectName", data.get("PROJECT_NAME"));
+		return map;
+				
+	}
+
+	@Override
+	public List<newMachineApplyVO> listNewMachineApply(String begintimequery, String endtimequery, String body,String userID) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("startTime", begintimequery);
+		map.put("endTime", endtimequery);
+		map.put("body", body);
+		map.put("userID",userID);
+		return applyMapper.listNewMachineApply(map);
+	}
+
+	@Override
+	public void UpdateMachineApply(String applyID, String filePath) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("applyID", applyID);
+		map.put("filePath", filePath);
+		applyMapper.UpdateMachineApply(map);
+	}
+
+	@Override
+	public List<applyMachineInfoVO> listApplyDetail(String applyID) {
+		
+		return applyMapper.listApplyDetail(applyID);
+	}
+
+	@Override
+	public List<newMachineApplyVO> listNewMachineApproval(queryVO vo) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("startTime", vo.getStartTime());
+		map.put("endTime", vo.getEndTime());
+		map.put("body", vo.getBody());
+		map.put("userID",vo.getUserID());
+		map.put("projectID",vo.getProjectID());
+		map.put("state",vo.getState());
+		return applyMapper.listNewMachineApproval(map);
+	}
+
+
+}

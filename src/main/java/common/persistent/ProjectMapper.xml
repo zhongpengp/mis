@@ -390,4 +390,30 @@
   <update id="machineDestroy" parameterType="java.lang.String">
   	    update PROJECT_INSTRUMENT_INFO SET MACHINE_STATE = '3' WHERE ID in (${ids})
   </update>
+  
+  <select id="machineAlarmInfo" parameterType="java.lang.String" resultType="java.util.Map" >
+  		SELECT t.CHK,t1.RPR FROM
+		(SELECT
+			CAST(COUNT(1) AS CHAR) CHK 
+			FROM
+				PROJECT_INSTRUMENT_INFO 
+			WHERE PROJECT_ID=#{id}
+				and ADDDATE(SYSDATE(),30) >= CHECK_DATE
+				and MACHINE_STATE='0') t, 
+			(SELECT
+				CAST(COUNT(1) AS CHAR) RPR
+			FROM
+				PROJECT_INSTRUMENT_INFO
+			WHERE PROJECT_ID=#{id}
+				and MACHINE_STATE='2') t1
+  </select>
+  
+  <update id="updateMachineApproval" parameterType="java.util.Map">
+  	 UPDATE PROJECT_NEWM_APPLY t
+		SET t.APPROVAL_DATE = #{date},
+			t.APPROVAL_DETAIL = #{detail},
+    		t.APPROVAL_USERID = #{id},
+    		t.APPLY_STATE = #{state}
+		WHERE t.APPLY_ID = #{applyID} 
+  </update>
 </mapper>

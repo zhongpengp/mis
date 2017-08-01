@@ -72,27 +72,22 @@
 	</insert>
 	<select id="getUserByGS" parameterType="java.lang.String" resultMap="BaseResultMap">
 		select * from USER where USER_ID in(
-			SELECT t2.GYS_USER_ID as userID
-			from COMPANY t1
-			LEFT JOIN GS_GYS t2
-			on t1.GS_ID=t2.GS_USER_ID
-			where t1.GS_ID=#{userID}
+			select GYS_USER_ID as userID from GS_GYS t where t.GS_USER_ID = #{userID}
 			union 
-			select t3.PROJECT_ID as userID
-			from PROJECT t3
-			where t3.COMPANY_ID=#{userID})
+			select t3.PROJECT_ID as userID from PROJECT t3 where t3.COMPANY_ID=#{userID})
 	</select>
 	<select id="getUserByXM" parameterType="java.lang.String" resultMap="BaseResultMap">
-		select * from USER u where u.USER_ID =(
-		select t.COMPANY_ID from PROJECT t where t.PROJECT_ID=#{userID})
+		select * from USER u where u.USER_ID in (
+		select t.COMPANY_ID as userID from PROJECT t where t.PROJECT_ID=#{userID}
+		union
+		select GYS_USER_ID as userID from XM_GYS t1 where t1.XM_USER_ID = #{userID} 
+		)
 	</select>
 	<select id="getUserByGYS" parameterType="java.lang.String" resultMap="BaseResultMap">
 		select * from USER u where u.USER_ID in(
-		  SELECT t2.GYS_USER_ID 
-			from COMPANY t1
-			LEFT JOIN GS_GYS t2
-			on t1.GS_ID=t2.GS_USER_ID
-			where t1.GS_ID=#{userID)
+		  select GS_USER_ID as userID from GS_GYS t where t.GYS_USER_ID = #{userID}
+		  union
+		  select XM_USER_ID as userID from XM_GYS t1 where t1.GYS_USER_ID = #{userID})
 	</select>
 	<update id="recevieMessage" parameterType="java.util.Map">
 		UPDATE MESSAGE set MESSAGE_REPLY = #{messageReply},ATTACHMENT_REPLY =#{attachmentReply},IS_RECEIVER_READ = #{isRecevierRead} where MESSAGE_ID = #{messageId}
